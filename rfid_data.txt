@@ -1,1 +1,1 @@
-83,47,7B,02,
+Error: could not open port 'COM4': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)

@@ -1,5 +1,10 @@
 <?php
 session_start();
+// Force session to not be saved in browser cache
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 include("php/config.php");
 
 error_reporting(E_ALL);
@@ -7,6 +12,7 @@ ini_set('display_errors', 1);
 
 $message = "";
 $owner_verified = false;
+$data_file = "rfid_data.txt"; // File where Arduino/Python writes the RFID data
 
 // Initialize session variables
 if (!isset($_SESSION['asset_details'])) $_SESSION['asset_details'] = [];
@@ -28,9 +34,6 @@ function verifyOwner() {
         }
     }
 }
-
-// Add this near the beginning of your file, after session_start() and include statements
-$data_file = "rfid_data.txt"; // File where Arduino/Python writes the RFID data
 
 // AJAX endpoint to get the RFID data from the text file
 if (isset($_GET['read_rfid'])) {
@@ -60,6 +63,12 @@ if (isset($_GET['read_rfid'])) {
 
 // Handle RFID Verification (both UID and Secret)
 if (isset($_POST['rfid_data'])) {
+    // Clear ALL previous details to ensure fresh data for any new RFID read
+    $_SESSION['asset_details'] = [];
+    $_SESSION['student_details'] = [];
+    $_SESSION['officer_details'] = [];
+    $_SESSION['assets_count'] = 0;
+    
     $input = trim($_POST['rfid_data']);
     
     // Debug: Log the input
@@ -74,7 +83,7 @@ if (isset($_POST['rfid_data'])) {
     // Determine if input is UID (VIRT_) or Secret (64 hex chars)
     if (preg_match('/^VIRT_[a-f0-9]+$/i', $input)) {
         // Handle as UID
-        $query = "SELECT assets.id, assets.*, users.Username, users.Lastname, users.School 
+        $query = "SELECT assets.*, users.Username, users.Lastname, users.School 
                  FROM assets 
                  JOIN users ON assets.reg_number = users.Reg_Number
                  WHERE assets.rfid_uid = ?";
@@ -89,17 +98,6 @@ if (isset($_POST['rfid_data'])) {
     } else {
         $message = "<div class='message error'><p>Invalid RFID format: " . htmlspecialchars($input) . "</p></div>";
         error_log("Invalid RFID format: " . $input);
-    }
-
-    // Add this right before the if (empty($message)) check
-    error_log("Checking database for RFID UID: " . $input);
-    $check_query = "SELECT COUNT(*) as count FROM assets WHERE rfid_uid = '" . mysqli_real_escape_string($con, $input) . "'";
-    $check_result = mysqli_query($con, $check_query);
-    if ($check_result) {
-        $row = mysqli_fetch_assoc($check_result);
-        error_log("Database check: Found " . $row['count'] . " matching records for " . $input);
-    } else {
-        error_log("Database check query failed: " . mysqli_error($con));
     }
 
     if (empty($message)) {
@@ -119,23 +117,11 @@ if (isset($_POST['rfid_data'])) {
                     $_SESSION['asset_details'] = mysqli_fetch_assoc($result);
                     error_log("Found asset: " . print_r($_SESSION['asset_details'], true));
                     
-                    // Update last scanned
-                    if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['id'])) {
-                        $update = mysqli_query($con, "UPDATE assets SET last_scanned = NOW() WHERE id = " . $_SESSION['asset_details']['id']);
-                        if (!$update) {
-                            error_log("Update failed: " . mysqli_error($con));
-                        }
-                    } else {
-                        // If id doesn't exist, try to update using rfid_uid instead
-                        if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['rfid_uid'])) {
-                            $rfid_uid = mysqli_real_escape_string($con, $_SESSION['asset_details']['rfid_uid']);
-                            $update = mysqli_query($con, "UPDATE assets SET last_scanned = NOW() WHERE rfid_uid = '$rfid_uid'");
-                            if (!$update) {
-                                error_log("Update failed: " . mysqli_error($con));
-                            }
-                        } else {
-                            error_log("Cannot update last_scanned: No id or rfid_uid available");
-                        }
+                    // Update last scanned - use serial_number instead of id
+                    $update = mysqli_query($con, "UPDATE assets SET last_scanned = NOW() WHERE serial_number = '" . 
+                        mysqli_real_escape_string($con, $_SESSION['asset_details']['serial_number']) . "'");
+                    if (!$update) {
+                        error_log("Update failed: " . mysqli_error($con));
                     }
                     
                     // Check tamper status
@@ -149,7 +135,8 @@ if (isset($_POST['rfid_data'])) {
                     if ($type == "Secret") {
                         $officer_id = $_SESSION['officer_details']['officer_id'] ?? 'unknown';
                         $log = mysqli_query($con, "INSERT INTO secret_logs (officer_id, asset_id, used_at) 
-                                               VALUES ('$officer_id', " . $_SESSION['asset_details']['id'] . ", NOW())");
+                                               VALUES ('" . mysqli_real_escape_string($con, $officer_id) . "', '" . 
+                                               mysqli_real_escape_string($con, $_SESSION['asset_details']['serial_number']) . "', NOW())");
                         if (!$log) {
                             error_log("Secret log failed: " . mysqli_error($con));
                         }
@@ -226,62 +213,6 @@ if (isset($_POST['reg_number'])) {
             $message = "<div class='message error'><p>Student not found with registration number: $reg_number</p></div>";
         }
     }
-}
-
-// Add this at the beginning of your file, after session_start()
-$data_file = "rfid_data.txt"; // File where Python/Arduino writes the RFID data
-error_log("RFID data file path: " . realpath($data_file)); // Log the absolute path
-
-// AJAX endpoint to get the RFID data from the text file
-if (isset($_GET['read_rfid'])) {
-    header('Content-Type: application/json');
-    
-    try {
-        error_log("RFID read request received");
-        
-        if (file_exists($data_file)) {
-            error_log("RFID data file exists");
-            
-            if (is_readable($data_file)) {
-                error_log("RFID data file is readable");
-                
-                $rfid_data = file_get_contents($data_file);
-                error_log("Raw RFID data: " . $rfid_data);
-                
-                $uid = trim($rfid_data);
-                
-                // Remove any trailing commas
-                $uid = rtrim($uid, ',');
-                error_log("RFID data after trim: " . $uid);
-                
-                // Check if it's in the format XX,XX,XX,XX
-                if (preg_match('/^([0-9A-F]{2},)*[0-9A-F]{2}$/i', $uid)) {
-                    error_log("RFID data matches expected format");
-                    
-                    // Remove commas to get a clean hex string
-                    $formatted_uid = 'VIRT_' . str_replace(',', '', $uid);
-                    error_log("Formatted RFID: " . $formatted_uid);
-                    
-                    echo json_encode(['uid' => $formatted_uid, 'status' => 'success']);
-                } else {
-                    error_log("RFID data does not match expected format");
-                    
-                    // If it's already formatted or in another format, just pass it through
-                    echo json_encode(['uid' => $uid, 'status' => 'success']);
-                }
-            } else {
-                error_log("RFID data file is not readable");
-                echo json_encode(['uid' => 'Error: Cannot read RFID data file', 'status' => 'error']);
-            }
-        } else {
-            error_log("RFID data file does not exist at: " . realpath(dirname(__FILE__)) . "/" . $data_file);
-            echo json_encode(['uid' => 'Error: RFID data file not found', 'status' => 'error']);
-        }
-    } catch (Exception $e) {
-        error_log("Exception in RFID read: " . $e->getMessage());
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -473,7 +404,6 @@ if (isset($_GET['read_rfid'])) {
                     <?php echo strlen($_POST['rfid_data']); ?>
                 </p>
                 <p>Is UID:
-
                     <?php echo preg_match('/^VIRT_[a-f0-9]+$/i', $_POST['rfid_data']) ? 'Yes' : 'No'; ?>
                 </p>
                 <p>Is Secret:
@@ -490,7 +420,7 @@ if (isset($_GET['read_rfid'])) {
                 <form id="rfid-form" method="post">
                     <div class="field input">
                         <label for="rfid_data">Enter RFID UID or Secret:</label>
-                        <input type="text" name="rfid_data" id="manual-rfid-input" placeholder="Enter RFID UID" required>
+                        <input type="text" name="rfid_data" id="manual-rfid-input" placeholder="VIRT_... or 64-character secret" required>
                     </div>
                     <div class="field">
                         <input type="submit" value="Verify" class="btn">
@@ -635,26 +565,46 @@ if (isset($_GET['read_rfid'])) {
         function startRFIDListener() {
             console.log("Starting RFID listener");
             
+            // Keep track of the last processed UID to avoid duplicates
+            let lastProcessedUID = '';
+            let processingSubmit = false;
+            
             async function pollRFIDData() {
+                // Don't poll if we're currently processing a submission
+                if (processingSubmit) {
+                    return;
+                }
+                
                 try {
-                    const response = await fetch('?read_rfid=1');
+                    const response = await fetch('?read_rfid=1&t=' + new Date().getTime(), {
+                        cache: 'no-store' // Prevent caching
+                    });
                     
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     
                     const data = await response.json();
-                    console.log("RFID response:", data);
                     
                     if (data.status === 'success' && data.uid) {
                         const uid = data.uid.trim();
-                        console.log("Received RFID UID:", uid);
-                        
-                        // Populate the form field with the RFID data
                         const rfidInput = document.getElementById('manual-rfid-input');
-                        if (rfidInput) {
-                            rfidInput.value = uid;
-                            console.log("RFID input field populated with:", uid);
+                        
+                        // Only process if it's a new UID and different from what's already in the input field
+                        if (uid && uid !== lastProcessedUID && uid !== rfidInput.value) {
+                            console.log("New RFID data received:", uid);
+                            
+                            // Update the last processed UID
+                            lastProcessedUID = uid;
+                            
+                            // Populate the form field with the RFID data
+                            if (rfidInput) {
+                                rfidInput.value = uid;
+                                
+                                // Auto-submit the form for new scans
+                                processingSubmit = true;
+                                document.getElementById('rfid-form').dispatchEvent(new Event('submit'));
+                            }
                         }
                     }
                 } catch (e) {
@@ -667,49 +617,97 @@ if (isset($_GET['read_rfid'])) {
             
             // Poll every 2 seconds
             setInterval(pollRFIDData, 2000);
-        }
-
-        // Start RFID listener when the document is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Document ready, starting RFID listener");
-            startRFIDListener();
-        });
-
-        // Function to submit the RFID form via AJAX (for manual submissions)
-        async function submitRFIDFormViaAjax(uid) {
-            try {
-                // Create form data
-                const formData = new FormData();
-                formData.append('rfid_data', uid);
+            
+            // Enhanced RFID form handling
+            document.getElementById('rfid-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
                 
                 // Show loading indicator
-                const messageContainer = document.createElement('div');
-                messageContainer.className = 'message';
-                messageContainer.innerHTML = '<p>Processing RFID data...</p>';
-                document.querySelector('.rfid-verification').appendChild(messageContainer);
-                
-                // Send AJAX request
-                const response = await fetch('', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                // Reload the page to show the results
-                window.location.reload();
-                
-            } catch (error) {
-                console.error("Error submitting RFID data:", error);
-                
-                // Show error message
-                const errorMsg = document.createElement('div');
-                errorMsg.className = 'message error';
-                errorMsg.innerHTML = `<p>Error processing RFID: ${error.message}</p>`;
-                document.querySelector('.rfid-verification').appendChild(errorMsg);
-            }
+                const submitBtn = this.querySelector('input[type="submit"]');
+                const originalBtnText = submitBtn.value;
+                submitBtn.value = "Processing...";
+                submitBtn.disabled = true;
+
+                fetch('', {
+                        method: 'POST',
+                        body: formData,
+                        cache: 'no-store' // Prevent caching
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Instead of reloading, fetch the response and update the page content
+                            return response.text();
+                        } else {
+                            throw new Error('Network response was not ok');
+                        }
+                    })
+                    .then(html => {
+                        // Parse the HTML response
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Update only the necessary parts of the page
+                        const newMessage = doc.querySelector('.message');
+                        if (newMessage) {
+                            const currentMessage = document.querySelector('.message');
+                            if (currentMessage) {
+                                currentMessage.replaceWith(newMessage);
+                            } else {
+                                document.querySelector('.rfid-verification').insertAdjacentElement('beforebegin', newMessage);
+                            }
+                        }
+                        
+                        // Update RFID details
+                        const newRfidDetails = doc.querySelector('.rfid-details');
+                        if (newRfidDetails) {
+                            const currentRfidDetails = document.querySelector('.rfid-details');
+                            if (currentRfidDetails) {
+                                currentRfidDetails.replaceWith(newRfidDetails);
+                            } else {
+                                document.querySelector('.rfid-verification').appendChild(newRfidDetails);
+                            }
+                        }
+                        
+                        // Update asset details
+                        const newAssetSection = doc.querySelector('.asset-section');
+                        if (newAssetSection) {
+                            const currentAssetSection = document.querySelector('.asset-section');
+                            if (currentAssetSection) {
+                                currentAssetSection.replaceWith(newAssetSection);
+                            } else {
+                                const leftSection = document.querySelector('.left-section');
+                                if (leftSection) {
+                                    leftSection.innerHTML = '<h3>Asset Details</h3>';
+                                    leftSection.appendChild(newAssetSection);
+                                }
+                            }
+                        }
+                        
+                        // Update owner verification
+                        const newOwnerVerification = doc.querySelector('.owner-verification');
+                        if (newOwnerVerification) {
+                            const currentOwnerVerification = document.querySelector('.owner-verification');
+                            if (currentOwnerVerification) {
+                                currentOwnerVerification.replaceWith(newOwnerVerification);
+                            } else {
+                                document.querySelector('.main-content').insertAdjacentElement('beforebegin', newOwnerVerification);
+                            }
+                        }
+                        
+                        console.log("Page content updated without reload");
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error processing RFID: ' + error.message);
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        submitBtn.value = originalBtnText;
+                        submitBtn.disabled = false;
+                        processingSubmit = false;
+                    });
+            });
         }
 
         // Initialize the Student QR code scanner
