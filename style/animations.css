@@ -1,0 +1,103 @@
+/* Background Animation Styles */
+
+.animation-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: #0a0e17;
+    overflow: hidden;
+}
+
+
+/* Scanner Line Animation */
+
+.scanner-line {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, rgba(0, 255, 240, 0), rgba(0, 255, 240, 0.5), rgba(0, 255, 240, 0.8), rgba(0, 255, 240, 0.5), rgba(0, 255, 240, 0));
+    box-shadow: 0 0 10px 2px rgba(0, 255, 240, 0.5);
+    animation: scan 6s linear infinite;
+    z-index: 1;
+}
+
+@keyframes scan {
+    0% {
+        left: -100%;
+        opacity: 0.8;
+    }
+    48% {
+        left: 100%;
+        opacity: 0.8;
+    }
+    50% {
+        left: 100%;
+        opacity: 0;
+    }
+    52% {
+        left: -100%;
+        opacity: 0;
+    }
+    100% {
+        left: -100%;
+        opacity: 0.8;
+    }
+}
+
+
+/* Grid Animation */
+
+.grid-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.grid-cell {
+    position: absolute;
+    background-color: rgba(0, 255, 240, 0.03);
+    border: 1px solid rgba(0, 255, 240, 0.1);
+    transition: all 0.3s ease;
+}
+
+.grid-cell.active {
+    background-color: rgba(0, 255, 240, 0.15);
+    box-shadow: 0 0 15px rgba(0, 255, 240, 0.5);
+    z-index: 1;
+}
+
+
+/* Additional Styles to Ensure Proper Rendering with Existing Content */
+
+body {
+    position: relative;
+    z-index: 1;
+    background-color: transparent !important;
+}
+
+.nav,
+main {
+    position: relative;
+    z-index: 2;
+}
+
+.main-box {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.options div {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.options div:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 50, 100, 0.2);
+}

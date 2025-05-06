@@ -20,16 +20,72 @@ if (!isset($_SESSION['student_details'])) $_SESSION['student_details'] = [];
 if (!isset($_SESSION['officer_details'])) $_SESSION['officer_details'] = [];
 if (!isset($_SESSION['assets_count'])) $_SESSION['assets_count'] = 0;
 
+// Function to log scan to database
+function logScan($rfid_uid, $status) {
+    global $con;
+    
+    // Get officer ID from session
+    $scanner_id = isset($_SESSION['officer_id']) ? $_SESSION['officer_id'] : 
+                 (isset($_SESSION['officer_details']['officer_id']) ? $_SESSION['officer_details']['officer_id'] : 'unknown');
+    
+    // Get location (can be set in configuration or passed as parameter)
+    $location = isset($_SESSION['scan_location']) ? $_SESSION['scan_location'] : 'Main Gate';
+    
+    // Prepare and execute query
+    $query = "INSERT INTO scan_logs (rfid_uid, scanner_id, location, status) 
+              VALUES (?, ?, ?, ?)";
+    
+    $stmt = mysqli_prepare($con, $query);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "ssss", $rfid_uid, $scanner_id, $location, $status);
+        $result = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        
+        if (!$result) {
+            error_log("Failed to log scan: " . mysqli_error($con));
+        }
+    } else {
+        error_log("Failed to prepare scan log statement: " . mysqli_error($con));
+    }
+}
+
 // Function to verify asset owner
 function verifyOwner() {
-    global $message, $owner_verified;
+    global $message, $owner_verified, $con;
     
     if (!empty($_SESSION['asset_details']) && !empty($_SESSION['student_details'])) {
         if ($_SESSION['asset_details']['reg_number'] === $_SESSION['student_details']['Reg_Number']) {
             $message .= "<div class='message success'><p>OWNER VERIFIED: This asset belongs to the scanned student.</p></div>";
             $owner_verified = true;
         } else {
-            $message .= "<div class='message error'><p>OWNER MISMATCH: This asset does NOT belong to the scanned student. Please investigate!</p></div>";
+            // Owner mismatch - blacklist the asset
+            $asset_serial = mysqli_real_escape_string($con, $_SESSION['asset_details']['serial_number']);
+            $scanned_student = mysqli_real_escape_string($con, $_SESSION['student_details']['Username'] . ' ' . $_SESSION['student_details']['Lastname']);
+            $registered_owner = mysqli_real_escape_string($con, $_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']);
+            
+            // Create a detailed blacklist reason that includes both the registered owner and the scanned student
+            $blacklist_reason = "Ownership mismatch. Asset registered to: $registered_owner but found with: $scanned_student";
+            
+            // Update only the AssetStatus and related fields
+            $blacklist_query = "UPDATE assets SET 
+                                AssetStatus = 'Blacklisted',
+                                date_blacklisted = NOW(),
+                                blacklist_reason = '$blacklist_reason'
+                                WHERE serial_number = '$asset_serial'";
+            
+            if (mysqli_query($con, $blacklist_query)) {
+                $message .= "<div class='message error'><p>OWNER MISMATCH: This asset does NOT belong to the scanned student.</p>";
+                $message .= "<p>The asset has been automatically BLACKLISTED.</p>";
+                $message .= "<p>Registered owner: <strong>" . htmlspecialchars($registered_owner) . "</strong></p>";
+                $message .= "<p>Found with: <strong>" . htmlspecialchars($scanned_student) . "</strong></p></div>";
+                
+                // Log the blacklisting action
+                logScan($_SESSION['asset_details']['rfid_uid'], 'blacklisted');
+            } else {
+                $message .= "<div class='message error'><p>OWNER MISMATCH: This asset does NOT belong to the scanned student.</p>";
+                $message .= "<p>Failed to blacklist asset: " . mysqli_error($con) . "</p></div>";
+            }
+            
             $owner_verified = false;
         }
     }
@@ -63,21 +119,24 @@ if (isset($_GET['read_rfid'])) {
 
 // Handle RFID Verification (both UID and Secret)
 if (isset($_POST['rfid_data'])) {
-    // Clear ALL previous details to ensure fresh data for any new RFID read
-    $_SESSION['asset_details'] = [];
-    $_SESSION['student_details'] = [];
-    $_SESSION['officer_details'] = [];
-    $_SESSION['assets_count'] = 0;
-    
     $input = trim($_POST['rfid_data']);
     
-    // Debug: Log the input
-    error_log("RFID Input Received: " . $input);
+    // Check if this is a different RFID than the last one scanned
+    $is_new_rfid = true;
+    if (!empty($_SESSION['asset_details']) && 
+        (($_SESSION['asset_details']['rfid_uid'] == $input) || 
+         ($_SESSION['asset_details']['rfid_secret'] == $input))) {
+        $is_new_rfid = false;
+    }
     
-    // Format the RFID data if needed
-    if (preg_match('/^([0-9A-F]{2},)*[0-9A-F]{2}$/i', $input)) {
-        $input = 'VIRT_' . str_replace(',', '', strtoupper($input));
-        error_log("Formatted RFID: " . $input);
+    // Only clear student details if this is a different RFID
+    if ($is_new_rfid) {
+        $_SESSION['asset_details'] = [];
+        $_SESSION['student_details'] = [];
+        $_SESSION['assets_count'] = 0;
+    } else {
+        // Just clear asset details to refresh them
+        $_SESSION['asset_details'] = [];
     }
     
     // Determine if input is UID (VIRT_) or Secret (64 hex chars)
@@ -124,16 +183,22 @@ if (isset($_POST['rfid_data'])) {
                         error_log("Update failed: " . mysqli_error($con));
                     }
                     
-                    // Check tamper status
+                    // When a tampered tag is detected
                     if ($_SESSION['asset_details']['rfid_status'] == 'tampered') {
                         $message = "<div class='message error'><p>TAMPERED TAG DETECTED!</p></div>";
+                        // Log with the actual asset status plus tampered flag
+                        logScan($input, $_SESSION['asset_details']['AssetStatus'] . '_tampered');
                     } else {
                         $message = "<div class='message success'><p>RFID verification successful! (Using $type)</p></div>";
+                        
+                        // Log the scan with the actual asset status from the database
+                        logScan($input, $_SESSION['asset_details']['AssetStatus']);
                     }
                     
                     // Log secret usage if applicable
                     if ($type == "Secret") {
-                        $officer_id = $_SESSION['officer_details']['officer_id'] ?? 'unknown';
+                        $officer_id = isset($_SESSION['officer_id']) ? $_SESSION['officer_id'] : 
+                                     (isset($_SESSION['officer_details']['officer_id']) ? $_SESSION['officer_details']['officer_id'] : 'unknown');
                         $log = mysqli_query($con, "INSERT INTO secret_logs (officer_id, asset_id, used_at) 
                                                VALUES ('" . mysqli_real_escape_string($con, $officer_id) . "', '" . 
                                                mysqli_real_escape_string($con, $_SESSION['asset_details']['serial_number']) . "', NOW())");
@@ -147,12 +212,16 @@ if (isset($_POST['rfid_data'])) {
                         verifyOwner();
                     }
                 } else {
+                    // When an RFID is not found in the system
                     if ($type == "Secret") {
                         $message = "<div class='message error'><p>Invalid RFID secret - not found in system</p></div>";
                     } else {
                         $message = "<div class='message error'><p>Invalid RFID UID - not found in system</p></div>";
                     }
                     error_log("No asset found for $type: " . $input);
+                    
+                    // Log as not found
+                    logScan($input, 'not_found');
                 }
             }
             mysqli_stmt_close($stmt);
@@ -198,6 +267,8 @@ if (isset($_POST['reg_number'])) {
                     } else {
                         if (mysqli_num_rows($officer_result) > 0) {
                             $_SESSION['officer_details'] = mysqli_fetch_assoc($officer_result);
+                            // Store officer_id in session for scan logging
+                            $_SESSION['officer_id'] = $_SESSION['officer_details']['officer_id'];
                         } else {
                             $message = "<div class='message error'><p>Officer not found with ID: $officer_id</p></div>";
                         }
@@ -213,6 +284,12 @@ if (isset($_POST['reg_number'])) {
             $message = "<div class='message error'><p>Student not found with registration number: $reg_number</p></div>";
         }
     }
+}
+
+// Check if we need to show the missing asset modal
+$show_missing_modal = false;
+if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['AssetStatus']) && $_SESSION['asset_details']['AssetStatus'] == 'missing') {
+    $show_missing_modal = true;
 }
 ?>
 <!DOCTYPE html>
@@ -385,11 +462,222 @@ if (isset($_POST['reg_number'])) {
             border-radius: 5px;
             font-family: monospace;
         }
+        
+        /* Officer Info Bar */
+        .officer-info-bar {
+            background: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .officer-info-bar .officer-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .officer-info-bar .officer-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .officer-info-bar .officer-id {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .officer-info-bar .scan-count {
+            background: #007bff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 0;
+            width: 70%;
+            max-width: 700px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            animation: modalopen 0.5s;
+        }
+        
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-60px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .emergency-modal .modal-content {
+            background-color: #fff;
+            border: 3px solid #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        
+        .emergency-modal .modal-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .emergency-modal h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .emergency-modal .modal-body {
+            padding: 20px;
+        }
+        
+        .emergency-modal .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            text-align: right;
+        }
+        
+        .emergency-message {
+            font-size: 1.1rem;
+        }
+        
+        .emergency-message p {
+            margin-bottom: 15px;
+        }
+        
+        .emergency-message strong {
+            color: #dc3545;
+            font-size: 1.2em;
+        }
+        
+        .action-instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .action-instructions h3 {
+            margin-top: 0;
+            color: #dc3545;
+        }
+        
+        .action-instructions ol {
+            padding-left: 20px;
+        }
+        
+        .action-instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .missing-detail {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+        }
+        
+        .missing-detail strong {
+            color: #721c24;
+        }
+        
+        .close-modal {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #f8f9fa;
+        }
+        
+        .status-missing {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .status-blacklisted {
+            background: #343a40;
+            color: white;
+        }
+        
+        .status-recovered {
+            background: #28a745;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <!-- Officer Info Bar -->
+        <?php if (isset($_SESSION['officer_details']) && !empty($_SESSION['officer_details'])): ?>
+        <div class="officer-info-bar">
+            <div class="officer-details">
+                <div class="officer-name"><?php echo htmlspecialchars($_SESSION['officer_details']['name'] . ' ' . $_SESSION['officer_details']['lastname']); ?></div>
+                <div class="officer-id">ID: <?php echo htmlspecialchars($_SESSION['officer_details']['officer_id']); ?></div>
+            </div>
+            <div class="scan-count">
+                <?php 
+                    // Get scan count for today
+                    $officer_id = mysqli_real_escape_string($con, $_SESSION['officer_details']['officer_id']);
+                    $scan_count_query = "SELECT COUNT(*) as count FROM scan_logs WHERE scanner_id = '$officer_id' AND DATE(scan_time) = CURDATE()";
+                    $scan_count_result = mysqli_query($con, $scan_count_query);
+                    $scan_count = 0;
+                    if ($scan_count_result && $row = mysqli_fetch_assoc($scan_count_result)) {
+                        $scan_count = $row['count'];
+                    }
+                    echo "Today's Scans: " . $scan_count;
+                ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
         <div class="box form-box">
             <header>Verify Assets</header>
 
@@ -441,6 +729,11 @@ if (isset($_POST['reg_number'])) {
                     <p><strong>Status:</strong>
                         <span class="rfid-status status-<?php echo htmlspecialchars($_SESSION['asset_details']['rfid_status']); ?>">
                             <?php echo strtoupper(htmlspecialchars($_SESSION['asset_details']['rfid_status'])); ?>
+                        </span>
+                    </p>
+                    <p><strong>Asset Status:</strong>
+                        <span class="rfid-status status-<?php echo strtolower(htmlspecialchars($_SESSION['asset_details']['AssetStatus'] ?? 'unknown')); ?>">
+                            <?php echo strtoupper(htmlspecialchars($_SESSION['asset_details']['AssetStatus'] ?? 'UNKNOWN')); ?>
                         </span>
                     </p>
                     <p><strong>Last Scanned:</strong>
@@ -527,7 +820,6 @@ if (isset($_POST['reg_number'])) {
                             <?php echo htmlspecialchars($_SESSION['assets_count']); ?>
                         </p>
                     </div>
-
                     <?php if (!empty($_SESSION['officer_details'])): ?>
                     <div class="officer-section">
                         <h3>Officer Details</h3>
@@ -557,6 +849,36 @@ if (isset($_POST['reg_number'])) {
                 <input type="hidden" name="reg_number" id="reg_number">
                 <input type="hidden" name="officer_id" id="officer_id">
             </form>
+        </div>
+    </div>
+
+    <!-- Emergency Modal for Missing Assets -->
+    <div id="missingAssetModal" class="modal emergency-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal">×</span>
+                <h2>⚠️ ALERT: MISSING ASSET DETECTED ⚠️</h2>
+            </div>
+            <div class="modal-body">
+                <div class="emergency-message">
+                    <p>This asset has been reported as <strong>MISSING</strong>!</p>
+                    <div id="missingAssetDetails">
+                        <!-- Details will be filled by JavaScript -->
+                    </div>
+                    <div class="action-instructions">
+                        <h3>Required Actions:</h3>
+                        <ol>
+                            <li>Detain the individual in possession of this asset</li>
+                            <li>Contact security supervisor immediately</li>
+                            <li>Document the incident</li>
+                            <li>Do not release the asset without proper authorization</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="acknowledgeBtn" class="btn btn-danger">Acknowledge Alert</button>
+            </div>
         </div>
     </div>
 
@@ -597,6 +919,9 @@ if (isset($_POST['reg_number'])) {
                             // Update the last processed UID
                             lastProcessedUID = uid;
                             
+                            // Don't clear student information here - let the server handle it
+                            // based on whether this is a different RFID from the last one
+                            
                             // Populate the form field with the RFID data
                             if (rfidInput) {
                                 rfidInput.value = uid;
@@ -609,6 +934,21 @@ if (isset($_POST['reg_number'])) {
                     }
                 } catch (e) {
                     console.error("RFID Error:", e);
+                }
+            }
+            
+            // Function to clear student information
+            function clearStudentInformation() {
+                // Clear student section
+                const studentSection = document.querySelector('.right-section');
+                if (studentSection) {
+                    studentSection.innerHTML = '<h3>Student Details</h3><p>No student data available. Scan a student QR code to populate this section.</p>';
+                }
+                
+                // Clear owner verification section if it exists
+                const ownerVerification = document.querySelector('.owner-verification');
+                if (ownerVerification) {
+                    ownerVerification.remove();
                 }
             }
             
@@ -684,16 +1024,37 @@ if (isset($_POST['reg_number'])) {
                             }
                         }
                         
-                        // Update owner verification
-                        const newOwnerVerification = doc.querySelector('.owner-verification');
-                        if (newOwnerVerification) {
-                            const currentOwnerVerification = document.querySelector('.owner-verification');
-                            if (currentOwnerVerification) {
-                                currentOwnerVerification.replaceWith(newOwnerVerification);
-                            } else {
-                                document.querySelector('.main-content').insertAdjacentElement('beforebegin', newOwnerVerification);
+                        // Check if we need to show the missing asset modal
+                        // Look for a status indicator with "MISSING" text
+                        const assetStatusElements = document.querySelectorAll('.rfid-status');
+                        let isMissing = false;
+                        
+                        assetStatusElements.forEach(element => {
+                            if (element.textContent.trim() === 'MISSING') {
+                                isMissing = true;
+                                
+                                // Populate missing asset details
+                                const missingAssetDetails = document.getElementById('missingAssetDetails');
+                                if (missingAssetDetails) {
+                                    // Get asset details from the page
+                                    const serialNumber = document.querySelector('.asset-section p:nth-child(2)').textContent;
+                                    const model = document.querySelector('.asset-section p:nth-child(3)').textContent;
+                                    const owner = document.querySelector('.asset-section p:nth-child(5)').textContent;
+                                    
+                                    // Create HTML for missing asset details
+                                    missingAssetDetails.innerHTML = `
+                                        <div class="missing-detail">${serialNumber}</div>
+                                        <div class="missing-detail">${model}</div>
+                                        <div class="missing-detail">${owner}</div>
+                                        <div class="missing-detail"><strong>Date Reported Missing:</strong> 
+                                            ${new Date().toLocaleDateString()}</div>
+                                    `;
+                                }
+                                
+                                // Show the modal
+                                document.getElementById('missingAssetModal').style.display = 'block';
                             }
-                        }
+                        });
                         
                         console.log("Page content updated without reload");
                     })
@@ -718,9 +1079,20 @@ if (isset($_POST['reg_number'])) {
                 const regNumberMatch = decodedText.match(/Reg Number: ([^,]+)/);
                 const officerIdMatch = decodedText.match(/Officer ID: ([^,]+)/);
 
-                if (regNumberMatch && regNumberMatch[1] && officerIdMatch && officerIdMatch[1]) {
+                if (regNumberMatch && regNumberMatch[1]) {
                     document.getElementById('reg_number').value = regNumberMatch[1].trim();
-                    document.getElementById('officer_id').value = officerIdMatch[1].trim();
+                    
+                    // If officer ID is in the QR code, use it
+                    if (officerIdMatch && officerIdMatch[1]) {
+                        document.getElementById('officer_id').value = officerIdMatch[1].trim();
+                    } else {
+                        // Otherwise use the current logged in officer's ID
+                        const officerId = "<?php echo isset($_SESSION['officer_id']) ? $_SESSION['officer_id'] : ''; ?>";
+                        if (officerId) {
+                            document.getElementById('officer_id').value = officerId;
+                        }
+                    }
+                    
                     document.getElementById('scan-form-student').submit();
                 } else {
                     alert("Invalid Student QR code format. Please scan a valid student QR code.");
@@ -737,6 +1109,56 @@ if (isset($_POST['reg_number'])) {
                 qrbox: 250
             });
         html5QrcodeScannerStudent.render(onScanSuccessStudent);
+        
+        // Modal handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close modal when clicking the X
+            const closeButtons = document.querySelectorAll('.close-modal');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('missingAssetModal').style.display = 'none';
+                });
+            });
+            
+            // Close modal when clicking the acknowledge button
+            const acknowledgeBtn = document.getElementById('acknowledgeBtn');
+            if (acknowledgeBtn) {
+                acknowledgeBtn.addEventListener('click', function() {
+                    document.getElementById('missingAssetModal').style.display = 'none';
+                });
+            }
+            
+            // Close modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('missingAssetModal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Check if we need to show the missing asset modal on page load
+            <?php if ($show_missing_modal): ?>
+            // Populate missing asset details
+            const missingAssetDetails = document.getElementById('missingAssetDetails');
+            if (missingAssetDetails) {
+                missingAssetDetails.innerHTML = `
+                    <div class="missing-detail"><strong>Serial Number:</strong> 
+                        <?php echo htmlspecialchars($_SESSION['asset_details']['serial_number']); ?></div>
+                    <div class="missing-detail"><strong>Model:</strong> 
+                        <?php echo htmlspecialchars($_SESSION['asset_details']['item_model']); ?></div>
+                    <div class="missing-detail"><strong>Owner:</strong> 
+                        <?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?></div>
+                    <div class="missing-detail"><strong>Date Reported Missing:</strong> 
+                        <?php echo !empty($_SESSION['asset_details']['date_reported_missing']) ? 
+                            date('Y-m-d', strtotime($_SESSION['asset_details']['date_reported_missing'])) : 
+                            'Unknown'; ?></div>
+                `;
+            }
+            
+            // Show the modal
+            document.getElementById('missingAssetModal').style.display = 'block';
+            <?php endif; ?>
+        });
         
         // Start RFID listener
         document.addEventListener('DOMContentLoaded', startRFIDListener);

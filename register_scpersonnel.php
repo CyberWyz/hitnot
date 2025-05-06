@@ -14,10 +14,24 @@ if (isset($_POST['submit'])) {
         echo "<div class='message error'><p>This email is already used. Try another one.</p></div>";
         echo "<a href='javascript:self.history.back()'><button class='btn'>Go Back</button></a>";
     } else {
-        mysqli_query($con, "INSERT INTO scpersonnel (officer_id, name, lastname, email, password) VALUES ('$officer_id', '$name', '$lastname', '$email', '$password')") or die("Error Occurred");
+        // Check if status column exists
+        $check_column = mysqli_query($con, "SHOW COLUMNS FROM scpersonnel LIKE 'status'");
+        if (mysqli_num_rows($check_column) == 0) {
+            mysqli_query($con, "ALTER TABLE scpersonnel ADD COLUMN status VARCHAR(20) DEFAULT NULL");
+        }
 
-        echo "<div class='message success'><p>Registration successful!</p></div>";
-        echo "<a href='index.php'><button class='btn'>Login Now</button></a>";
+        // Modify your INSERT query to include the status
+        $sql = "INSERT INTO scpersonnel(name, lastname, officer_id, email, password, status) 
+                VALUES('$name', '$lastname', '$officer_id', '$email', '$password', 'pending')";
+
+        // After successful registration, show a message about pending approval
+        if (mysqli_query($con, $sql)) {
+            echo "<div class='message'>
+                    <p>Registration successful! Your account is pending approval by an administrator.</p>
+                    <p>You will be able to log in once your account is approved.</p>
+                    <a href='sclogin.php'><button class='btn'>Login Now</button></a>
+                  </div>";
+        }
     }
 } else {
 ?>

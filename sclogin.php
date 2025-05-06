@@ -12,12 +12,18 @@ if (isset($_POST['submit'])) {
         $result = mysqli_fetch_assoc($query);
 
         if (password_verify($password, $result['password'])) {
-            $_SESSION['valid'] = true;
-            $_SESSION['id'] = $result['id'];
-            $_SESSION['name'] = $result['name'];
-
-            header("Location: schome.php");
-            exit;
+            // Check if the account is approved
+            if (isset($result['status']) && $result['status'] == 'approved') {
+                $_SESSION['valid'] = true;
+                $_SESSION['id'] = $result['id'];
+                $_SESSION['name'] = $result['name'];
+                header("Location: schome.php");
+                exit;
+            } elseif (isset($result['status']) && $result['status'] == 'rejected') {
+                echo "<div class='message error'><p>Your account has been rejected. Please contact the administrator.</p></div>";
+            } else {
+                echo "<div class='message error'><p>Your account is pending approval. Please wait for administrator approval.</p></div>";
+            }
         } else {
             echo "<div class='message error'><p>Incorrect password!</p></div>";
         }

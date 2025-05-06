@@ -127,6 +127,11 @@ if (isset($_POST['submit'])) {
                 <p><strong>Status:</strong> $rfid_status</p>
                 <small>Click on UID to copy</small>
             </div>
+            <div class='qr-details'>
+                <h4>QR Code Generated</h4>
+                <p>A QR code has been generated for the student/staff member.</p>
+                <p>You can view and download this QR code below the form.</p>
+            </div>
         </div>
 HTML;
     } else {
@@ -141,6 +146,7 @@ HTML;
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="responsive.css">
     <title>Register Asset</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -194,6 +200,31 @@ HTML;
         .status-error {
             color: #dc3545;
         }
+        .qr-code-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+
+        .qr-code-container h3 {
+            margin-top: 0;
+            color: #495057;
+            font-size: 1.1em;
+        }
+
+        #qrcode-student {
+            margin: 15px auto;
+            width: 128px;
+            height: 128px;
+        }
+
+        #qrcode-student img {
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -242,6 +273,14 @@ HTML;
                 <div class="field input">
                     <label for="picture">Asset Picture</label>
                     <input type="file" name="picture" id="picture" accept="image/*">
+                </div>
+
+                <div class="field">
+                    <div class="qr-code-container">
+                        <h3>Student/Staff QR Code</h3>
+                        <div id="qrcode-student"></div>
+                        <button type="button" id="download-student-qr" class="btn" style="display:none;">Download QR Code</button>
+                    </div>
                 </div>
 
                 <div class="field">
@@ -310,6 +349,85 @@ HTML;
                 setInterval(readRFID, 1000);
             }
         });
+        
+        // Function to generate and display student QR code
+        function generateStudentQRCode(regNumber, dateRegistered, officerLastname, officerId) {
+            // Check if student already exists
+            fetch(`check_student.php?reg_number=${encodeURIComponent(regNumber)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const qrCodeStudentElement = document.getElementById('qrcode-student');
+                    qrCodeStudentElement.innerHTML = '';
+            
+                    if (data.exists) {
+                        qrCodeStudentElement.innerHTML = "<p>Student QR code not generated (registration number already exists).</p>";
+                        document.getElementById('download-student-qr').style.display = 'none';
+                    } else {
+                        const qrDataStudent = `Reg Number: ${regNumber}, Date Registered: ${dateRegistered}, Officer: ${officerLastname}, Officer ID: ${officerId}`;
+                        new QRCode(qrCodeStudentElement, {
+                            text: qrDataStudent,
+                            width: 128,
+                            height: 128
+                        });
+                        document.getElementById('download-student-qr').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking registration number:", error);
+                    alert("Error checking registration number. Please try again.");
+                });
+        }
+
+        // Function to download the generated QR code
+        function downloadStudentQRCode() {
+            const qrElement = document.getElementById('qrcode-student');
+            html2canvas(qrElement).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'student_qr.png';
+                link.click();
+            });
+        }
+
+        // Add event listeners to form fields to update QR code
+        document.getElementById('reg_number').addEventListener('input', function() {
+            const regNumber = this.value;
+            const dateRegistered = document.getElementById('date_registered').value;
+            
+            if (regNumber && dateRegistered) {
+                generateStudentQRCode(regNumber, dateRegistered, "<?php echo $officer_lastname; ?>", "<?php echo $officer_id; ?>");
+            }
+        });
+
+        document.getElementById('date_registered').addEventListener('change', function() {
+            const dateRegistered = this.value;
+            const regNumber = document.getElementById('reg_number').value;
+            
+            if (regNumber && dateRegistered) {
+                generateStudentQRCode(regNumber, dateRegistered, "<?php echo $officer_lastname; ?>", "<?php echo $officer_id; ?>");
+            }
+        });
+
+        // Add event listener to download button
+        document.getElementById('download-student-qr').addEventListener('click', downloadStudentQRCode);
+
+        // Function to copy text to clipboard
+        function copyToClipboard(element) {
+            const text = element.textContent;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            // Show a temporary tooltip or notification
+            const originalText = element.innerHTML;
+            element.innerHTML = "Copied!";
+            setTimeout(() => {
+                element.innerHTML = originalText;
+            }, 1000);
+        }
     </script>
 </body>
 </html>

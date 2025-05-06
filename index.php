@@ -3,19 +3,19 @@ session_start();
 include("php/config.php");
 
 if (isset($_POST['submit'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = mysqli_real_escape_string($con, $_POST['username']);
+    $password = mysqli_real_escape_string($con, $_POST['password']);
 
-    $query = mysqli_query($con, "SELECT * FROM users WHERE Username='$username'");
-
-    if (mysqli_num_rows($query) > 0) {
-        $result = mysqli_fetch_assoc($query);
-
-        if (password_verify($password, $result['Password'])) {
+    $result = mysqli_query($con, "SELECT * FROM users WHERE Username='$username'") or die("Select Error");
+    
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        
+        // Check if password is stored as a hash or plain text
+        if (password_verify($password, $row['Password']) || $password === $row['Password']) {
             $_SESSION['valid'] = true;
-            $_SESSION['id'] = $result['Id'];
-            $_SESSION['username'] = $result['Username'];
-
+            $_SESSION['username'] = $row['Username'];
+            $_SESSION['id'] = $row['Id'];
             header("Location: home.php");
             exit;
         } else {
@@ -55,7 +55,8 @@ if (isset($_POST['submit'])) {
                 </div>
 
                 <div class="links">
-                    Don't have an account? <a href="register.php">Sign Up Now</a>
+                    Don't have an account? <a href="register.php">Sign Up Now</a><br>
+                    
                 </div>
             </form>
         </div>
