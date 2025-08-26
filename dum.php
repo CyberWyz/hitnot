@@ -9,31 +9,31 @@ if (!isset($_SESSION['valid'])) {
 
 $message = "";
 
-// Handle recovering an asset
-if (isset($_POST['recover_asset']) && isset($_POST['asset_id'])) {
+// Handle unblacklisting an asset
+if (isset($_POST['unblacklist']) && isset($_POST['asset_id'])) {
     $asset_id = mysqli_real_escape_string($con, $_POST['asset_id']);
-    $recovery_notes = mysqli_real_escape_string($con, $_POST['recovery_notes']);
     
     // Update the asset status
     $update_query = mysqli_query($con, "UPDATE assets SET 
-                                        AssetStatus = 'Recovered',
-                                        date_recovered = NOW(),
-                                        recovery_notes = '$recovery_notes'
+                                        AssetStatus = NULL,
+                                        blacklist_reason = NULL,
+                                        date_blacklisted = NULL,
+                                        rfid_status = 'active'
                                         WHERE serial_number = '$asset_id'");
     
     if ($update_query) {
-        $message = "<div class='message success'><p>Asset has been successfully marked as recovered.</p></div>";
+        $message = "<div class='message success'><p>Asset has been successfully removed from blacklist.</p></div>";
     } else {
-        $message = "<div class='message error'><p>Failed to update asset status: " . mysqli_error($con) . "</p></div>";
+        $message = "<div class='message error'><p>Failed to remove asset from blacklist: " . mysqli_error($con) . "</p></div>";
     }
 }
 
-// Get all missing assets with student information
-$query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phone, u.School, u.myphoto 
+// Get all blacklisted assets
+$query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname 
                             FROM assets a 
                             LEFT JOIN users u ON a.reg_number = u.Reg_Number 
-                            WHERE a.AssetStatus = 'Missing' 
-                            ORDER BY a.date_reported_missing DESC");
+                            WHERE a.AssetStatus = 'Blacklisted' 
+                            ORDER BY a.date_blacklisted DESC");
 
 ?>
 <!DOCTYPE html>
@@ -43,36 +43,36 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
-    <title>Missing Assets</title>
+    <title>Blacklisted Assets</title>
     <style>
-        .missing-table {
+        .blacklist-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .missing-table th, .missing-table td {
+        .blacklist-table th, .blacklist-table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-        .missing-table th {
+        .blacklist-table th {
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        .missing-table tr:nth-child(even) {
+        .blacklist-table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .missing-table tr:hover {
+        .blacklist-table tr:hover {
             background-color: #f1f1f1;
         }
-        .status-missing {
+        .status-blacklisted {
             background-color: #dc3545;
             color: white;
             padding: 3px 6px;
             border-radius: 3px;
             font-size: 0.8em;
         }
-        .btn-recover {
+        .btn-unblacklist {
             background-color: #28a745;
             color: white;
             border: none;
@@ -80,7 +80,7 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
             border-radius: 3px;
             cursor: pointer;
         }
-        .btn-recover:hover {
+        .btn-unblacklist:hover {
             background-color: #218838;
         }
         .no-assets {
@@ -97,46 +97,6 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
             max-height: 100px;
             border-radius: 4px;
         }
-        .student-photo {
-            max-width: 80px;
-            max-height: 80px;
-            border-radius: 50%;
-        }
-        .recovery-notes {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 5px;
-            width: 50%;
-            max-width: 500px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover {
-            color: black;
-        }
     </style>
 </head>
 <body>
@@ -152,18 +112,19 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
     
     <div class="container">
         <div class="box">
-            <h2>Missing Assets</h2>
+            <h2>Blacklisted Assets</h2>
             <a href="schome.php" class="back-link">← Back to Dashboard</a>
             
             <?php echo $message; ?>
             
             <?php if (mysqli_num_rows($query) > 0): ?>
-                <table class="missing-table">
+                <table class="blacklist-table">
                     <thead>
                         <tr>
                             <th>Asset Details</th>
-                            <th>Student Information</th>
-                            <th>Missing Report</th>
+                            <th>RFID Information</th>
+                            <th>Owner</th>
+                            <th>Blacklist Details</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -174,44 +135,37 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
                                     <?php if (!empty($asset['picture']) && file_exists($asset['picture'])): ?>
                                         <img src="<?php echo htmlspecialchars($asset['picture']); ?>" alt="Asset Image" class="asset-image"><br>
                                     <?php endif; ?>
-                                    <strong>Description:</strong> <?php echo htmlspecialchars($asset['item_description']); ?><br>
                                     <strong>Serial:</strong> <?php echo htmlspecialchars($asset['serial_number']); ?><br>
                                     <strong>Model:</strong> <?php echo htmlspecialchars($asset['item_model']); ?><br>
-                                    <strong>RFID:</strong> <code><?php echo htmlspecialchars($asset['rfid_uid']); ?></code><br>
-                                    <span class="status-missing">MISSING</span>
+                                    <strong>Description:</strong> <?php echo htmlspecialchars($asset['item_description']); ?>
+                                </td>
+                                <td>
+                                    <strong>RFID UID:</strong> <code><?php echo htmlspecialchars($asset['rfid_uid']); ?></code><br>
+                                    <strong>Status:</strong> <span class="status-blacklisted">BLACKLISTED</span><br>
+                                    <strong>Last Scanned:</strong> <?php echo !empty($asset['last_scanned']) ? 
+                                        date('Y-m-d H:i', strtotime($asset['last_scanned'])) : 'Never'; ?>
                                 </td>
                                 <td>
                                     <?php if (!empty($asset['Username']) && !empty($asset['Lastname'])): ?>
-                                        <?php if (!empty($asset['myphoto']) && file_exists($asset['myphoto'])): ?>
-                                            <img src="<?php echo htmlspecialchars($asset['myphoto']); ?>" alt="Student Photo" class="student-photo"><br>
-                                        <?php endif; ?>
                                         <strong>Name:</strong> <?php echo htmlspecialchars($asset['Username'] . ' ' . $asset['Lastname']); ?><br>
-                                        <strong>Reg Number:</strong> <?php echo htmlspecialchars($asset['reg_number']); ?><br>
-                                        <strong>Email:</strong> <?php echo htmlspecialchars($asset['Email']); ?><br>
-                                        <strong>Phone:</strong> <?php echo htmlspecialchars($asset['Phone']); ?><br>
-                                        <strong>School:</strong> <?php echo htmlspecialchars($asset['School']); ?>
+                                        <strong>Reg Number:</strong> <?php echo htmlspecialchars($asset['reg_number']); ?>
                                     <?php else: ?>
-                                        <em>No student information available</em>
+                                        <em>No owner information</em>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <strong>Date Reported:</strong><br>
-                                    <?php echo !empty($asset['date_reported_missing']) ? 
-                                        date('Y-m-d H:i', strtotime($asset['date_reported_missing'])) : 'Unknown'; ?><br>
-                                    <strong>Days Missing:</strong><br>
-                                    <?php 
-                                        if (!empty($asset['date_reported_missing'])) {
-                                            $reported_date = new DateTime($asset['date_reported_missing']);
-                                            $current_date = new DateTime();
-                                            $interval = $reported_date->diff($current_date);
-                                            echo $interval->days . ' days';
-                                        } else {
-                                            echo 'Unknown';
-                                        }
-                                    ?>
+                                    <strong>Date Blacklisted:</strong><br>
+                                    <?php echo !empty($asset['date_blacklisted']) ? 
+                                        date('Y-m-d H:i', strtotime($asset['date_blacklisted'])) : 'Unknown'; ?><br>
+                                    <strong>Reason:</strong><br>
+                                    <?php echo !empty($asset['blacklist_reason']) ? 
+                                        htmlspecialchars($asset['blacklist_reason']) : 'No reason provided'; ?>
                                 </td>
                                 <td>
-                                    <button class="btn-recover" onclick="openRecoveryModal('<?php echo $asset['serial_number']; ?>')">Mark as Recovered</button>
+                                    <form action="" method="post" onsubmit="return confirm('Are you sure you want to remove this asset from the blacklist?');">
+                                        <input type="hidden" name="asset_id" value="<?php echo $asset['serial_number']; ?>">
+                                        <button type="submit" name="unblacklist" class="btn-unblacklist">Remove from Blacklist</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -219,46 +173,10 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Email, u.Phon
                 </table>
             <?php else: ?>
                 <div class="no-assets">
-                    <p>No missing assets found.</p>
+                    <p>No blacklisted assets found.</p>
                 </div>
             <?php endif; ?>
         </div>
     </div>
-    
-    <!-- Recovery Modal -->
-    <div id="recoveryModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeRecoveryModal()">×</span>
-            <h3>Mark Asset as Recovered</h3>
-            <form action="" method="post">
-                <input type="hidden" id="asset_id" name="asset_id" value="">
-                <div>
-                    <label for="recovery_notes">Recovery Notes:</label>
-                    <textarea name="recovery_notes" id="recovery_notes" class="recovery-notes" rows="4" placeholder="Enter details about how the asset was recovered..."></textarea>
-                </div>
-                <button type="submit" name="recover_asset" class="btn-recover">Confirm Recovery</button>
-            </form>
-        </div>
-    </div>
-    
-    <script>
-        // Modal functions
-        function openRecoveryModal(assetId) {
-            document.getElementById('asset_id').value = assetId;
-            document.getElementById('recoveryModal').style.display = 'block';
-        }
-        
-        function closeRecoveryModal() {
-            document.getElementById('recoveryModal').style.display = 'none';
-        }
-        
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById('recoveryModal');
-            if (event.target == modal) {
-                closeRecoveryModal();
-            }
-        }
-    </script>
 </body>
 </html>

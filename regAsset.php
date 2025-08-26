@@ -146,147 +146,95 @@ HTML;
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
+
+<link rel="stylesheet" href="style/missingassets.css">
     <link rel="stylesheet" href="responsive.css">
+    <link rel="stylesheet" href="style/regAsset.css">
     <title>Register Asset</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        .rfid-details {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 5px;
-        }
-        .copyable {
-            cursor: pointer;
-            padding: 2px 5px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        .copyable:hover {
-            background: rgba(0,0,0,0.2);
-        }
-        .message.success {
-            max-width: 100%;
-        }
-        /* RFID Reader Styles */
-        .rfid-reader {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .rfid-reader h3 {
-            margin-top: 0;
-            color: #495057;
-        }
-        
-        #rfid-status {
-            font-size: 1.2em;
-            margin: 15px 0;
-        }
-        
-        .status-waiting {
-            color: #6c757d;
-        }
-        
-        .status-success {
-            color: #28a745;
-        }
-        
-        .status-error {
-            color: #dc3545;
-        }
-        .qr-code-container {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            text-align: center;
-            background-color: #f8f9fa;
-        }
 
-        .qr-code-container h3 {
-            margin-top: 0;
-            color: #495057;
-            font-size: 1.1em;
-        }
-
-        #qrcode-student {
-            margin: 15px auto;
-            width: 128px;
-            height: 128px;
-        }
-
-        #qrcode-student img {
-            display: block;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="box form-box">
-            <header>Register New Asset</header>
-            
-            <!-- RFID Reader Section -->
-            <div class="rfid-reader">
-                <h3>RFID Tag Reader</h3>
-                <p>Place an RFID tag near the reader to capture its UID.</p>
-                <div id="rfid-status" class="status-waiting">Waiting for RFID tag...</div>
-                <button id="refresh-rfid" class="btn">Refresh RFID</button>
-            </div>
-            
-            <!-- Asset Registration Form -->
-            <form action="" method="post" enctype="multipart/form-data">
-                <!-- Hidden RFID UID field that will be populated by the reader -->
-                <input type="hidden" name="rfid_uid" id="rfid-uid-input">
+    <!-- Sidebar navigation -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <span>Smart Tag Asset Management System</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="schome.php">Dashboard</a></li>
+            <li><a href="missingassets.php">Missing Assets</a></li>
+            <li><a href="regAsset.php" class="active">Register New Asset</a></li>
+            <li><a href="blacklistedassets.php">Blacklisted Assets</a></li>
+            <li><a href="verifyassets.php">Verify Asset</a></li>
+            <li><a href="php/logout.php">Logout</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main content -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="box form-box">
+                <header>Register New Asset</header>
                 
-                <div class="field input">
-                    <label for="item_description">Item Description</label>
-                    <input type="text" name="item_description" id="item_description" required>
+                <?php if(isset($message)) echo $message; ?>
+                
+                <!-- RFID Reader Section -->
+                <div class="rfid-reader">
+                    <h3>RFID Tag Reader</h3>
+                    <p>Place an RFID tag near the reader to capture its UID.</p>
+                    <div id="rfid-status" class="status-waiting">Waiting for RFID tag...</div>
+                    <button id="refresh-rfid" class="btn">Refresh RFID</button>
                 </div>
-
-                <div class="field input">
-                    <label for="item_model">Item Model</label>
-                    <input type="text" name="item_model" id="item_model" required>
-                </div>
-
-                <div class="field input">
-                    <label for="reg_number">Registration Number</label>
-                    <input type="text" name="reg_number" id="reg_number" required>
-                </div>
-
-                <div class="field input">
-                    <label for="serial_number">Serial Number</label>
-                    <input type="text" name="serial_number" id="serial_number" required>
-                </div>
-
-                <div class="field input">
-                    <label for="date_registered">Date Registered</label>
-                    <input type="date" name="date_registered" id="date_registered" required>
-                </div>
-
-                <div class="field input">
-                    <label for="picture">Asset Picture</label>
-                    <input type="file" name="picture" id="picture" accept="image/*">
-                </div>
-
-                <div class="field">
-                    <div class="qr-code-container">
-                        <h3>Student/Staff QR Code</h3>
-                        <div id="qrcode-student"></div>
-                        <button type="button" id="download-student-qr" class="btn" style="display:none;">Download QR Code</button>
+                
+                <!-- Asset Registration Form -->
+                <form action="" method="post" enctype="multipart/form-data">
+                    <!-- Hidden RFID UID field that will be populated by the reader -->
+                    <input type="hidden" name="rfid_uid" id="rfid-uid-input">
+                    
+                    <div class="field input">
+                        <label for="item_description">Item Description</label>
+                        <input type="text" name="item_description" id="item_description" required>
                     </div>
-                </div>
 
-                <div class="field">
-                    <input type="submit" name="submit" class="btn" value="Register Asset" id="submit-btn" disabled>
-                </div>
-            </form>
+                    <div class="field input">
+                        <label for="item_model">Item Model</label>
+                        <input type="text" name="item_model" id="item_model" required>
+                    </div>
+
+                    <div class="field input">
+                        <label for="reg_number">Registration Number</label>
+                        <input type="text" name="reg_number" id="reg_number" required>
+                    </div>
+
+                    <div class="field input">
+                        <label for="serial_number">Serial Number</label>
+                        <input type="text" name="serial_number" id="serial_number" required>
+                    </div>
+
+                    <div class="field input">
+                        <label for="date_registered">Date Registered</label>
+                        <input type="date" name="date_registered" id="date_registered" required>
+                    </div>
+
+                    <div class="field input">
+                        <label for="picture">Asset Picture</label>
+                        <input type="file" name="picture" id="picture" accept="image/*">
+                    </div>
+
+                    <div class="field">
+                        <div class="qr-code-container">
+                            <h3>Student/Staff QR Code</h3>
+                            <div id="qrcode-student"></div>
+                            <button type="button" id="download-student-qr" class="btn" style="display:none;">Download QR Code</button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <input type="submit" name="submit" class="btn" value="Register Asset" id="submit-btn" disabled>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -429,5 +377,6 @@ HTML;
             }, 1000);
         }
     </script>
+    <script src="js/missingassets.js"></script>
 </body>
 </html>

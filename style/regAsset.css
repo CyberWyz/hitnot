@@ -1,0 +1,203 @@
+ :root {
+    --primary: #4e73df;
+    --secondary: #858796;
+    --success: #1cc88a;
+    --info: #36b9cc;
+    --warning: #f6c23e;
+    --danger: #e74a3b;
+    --light: #f8f9fc;
+    --dark: #5a5c69;
+}
+
+body {
+    margin: 0;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fc;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #4e73df;
+    background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+    color: white;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.sidebar-brand {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    padding: 1.5rem 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 0;
+}
+
+.sidebar-menu a {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.sidebar-menu a:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu a.active {
+    color: white;
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.content-wrapper {
+    flex: 1;
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 1.5rem;
+}
+
+
+/* Original styles */
+
+.rfid-details {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+}
+
+.copyable {
+    cursor: pointer;
+    padding: 2px 5px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.copyable:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.message.success {
+    max-width: 100%;
+}
+
+
+/* RFID Reader Styles */
+
+.rfid-reader {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.rfid-reader h3 {
+    margin-top: 0;
+    color: #495057;
+}
+
+#rfid-status {
+    font-size: 1.2em;
+    margin: 15px 0;
+}
+
+.status-waiting {
+    color: #6c757d;
+}
+
+.status-success {
+    color: #28a745;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+.qr-code-container {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+.qr-code-container h3 {
+    margin-top: 0;
+    color: #495057;
+    font-size: 1.1em;
+}
+
+#qrcode-student {
+    margin: 15px auto;
+    width: 128px;
+    height: 128px;
+}
+
+#qrcode-student img {
+    display: block;
+    margin: 0 auto;
+}
+
+
+/* Adjusted container styles */
+
+.container {
+    width: 50%;
+    max-width: none;
+    padding: 0;
+}
+
+.box.form-box {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Message styles */
+
+.message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
