@@ -34,7 +34,6 @@ $query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname
                             LEFT JOIN users u ON a.reg_number = u.Reg_Number 
                             WHERE a.AssetStatus = 'Blacklisted' 
                             ORDER BY a.date_blacklisted DESC");
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
