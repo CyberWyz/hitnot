@@ -1,4 +1,5 @@
 /* Reset & Base Styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -17,7 +18,9 @@ body {
     font-family: Arial, sans-serif;
 }
 
+
 /* Dark Mode Styles */
+
 body.dark-mode {
     background-color: #121212;
     color: #ffffff;
@@ -55,7 +58,9 @@ body.dark-mode {
     color: #ddd;
 }
 
+
 /* Container Styles */
+
 .container {
     background-color: #fff;
     padding: 20px;
@@ -78,7 +83,9 @@ body.dark-mode {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Form Box Styles */
+
 .box {
     text-align: center;
     padding: 20px;
@@ -88,7 +95,9 @@ body.dark-mode {
     padding: 20px;
 }
 
+
 /* Header Styles */
+
 header {
     font-size: 24px;
     font-weight: bold;
@@ -101,7 +110,9 @@ header {
     margin-bottom: 20px;
 }
 
+
 /* Button Styles */
+
 .btn {
     background-color: #007bff;
     color: #fff;
@@ -121,7 +132,9 @@ header {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+
 /* User Type Section */
+
 .user-type {
     display: flex;
     flex-direction: column;
@@ -134,7 +147,9 @@ header {
     border-radius: 5px;
 }
 
+
 /* Navigation Styles */
+
 .nav {
     display: flex;
     justify-content: space-between;
@@ -159,7 +174,9 @@ header {
     text-decoration: underline;
 }
 
+
 /* Main Content Styles */
+
 main {
     margin-top: 20px;
 }
@@ -193,7 +210,9 @@ main {
     border-radius: 8px;
 }
 
+
 /* Form Field Styles */
+
 .field {
     margin-bottom: 15px;
 }
@@ -212,7 +231,9 @@ main {
     font-weight: bold;
 }
 
+
 /* Photo Container Styles */
+
 .photo-container {
     margin-top: 20px;
     text-align: center;
@@ -239,7 +260,9 @@ main {
     color: #333;
 }
 
+
 /* Asset Info Styles */
+
 .asset-info {
     margin-top: 20px;
     padding: 20px;
@@ -268,7 +291,9 @@ main {
     margin-top: 10px;
 }
 
+
 /* Options Styles */
+
 .options {
     display: flex;
     justify-content: space-around;
@@ -289,7 +314,9 @@ main {
     background: #0056b3;
 }
 
+
 /* Message Styles */
+
 .message {
     padding: 10px;
     margin-bottom: 20px;
@@ -308,7 +335,9 @@ main {
     color: #721c24;
 }
 
+
 /* Links Styles */
+
 .links {
     margin-top: 15px;
     text-align: center;
@@ -323,13 +352,23 @@ main {
     text-decoration: underline;
 }
 
+
 /* Animations */
+
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+
 /* Dark Mode Toggle Button */
+
 .theme-toggle-btn {
     position: fixed;
     top: 20px;
@@ -365,7 +404,9 @@ main {
     font-size: 18px;
 }
 
+
 /* About Section Styles */
+
 .about-section {
     margin-top: 30px;
     padding: 20px;
@@ -386,13 +427,16 @@ main {
     color: #555;
 }
 
+
 /* Table Styles */
+
 table {
     width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
@@ -401,7 +445,95 @@ th {
     background-color: #f2f2f2;
 }
 
+
+/* Sidebar styles */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: #222d32;
+    color: #fff;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-brand {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 24px 20px 16px 20px;
+    background: #1a2226;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+.sidebar-menu li {
+    width: 100%;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 14px 24px;
+    color: #b8c7ce;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    font-size: 1em;
+}
+
+.sidebar-menu li a.active,
+.sidebar-menu li a:hover {
+    background: #1e282c;
+    color: #fff;
+    font-weight: bold;
+}
+
+
+/* Make room for sidebar in main content */
+
+.container {
+    margin-left: 230px;
+    padding: 32px 24px 24px 24px;
+    min-height: 100vh;
+    background: #f4f6f9;
+    box-sizing: border-box;
+}
+
+
+/* Responsive: collapse sidebar on small screens */
+
+@media (max-width: 800px) {
+    .sidebar {
+        width: 60px;
+    }
+    .sidebar-brand {
+        font-size: 0.9em;
+        padding: 16px 8px;
+    }
+    .sidebar-menu li a {
+        padding: 12px 10px;
+        font-size: 0.95em;
+        text-align: center;
+    }
+    .container {
+        margin-left: 60px;
+        padding: 16px 8px 8px 8px;
+    }
+}
+
+
 /* Responsive Styles */
+
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;

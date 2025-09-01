@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - UniEssentials</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for enhanced animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- AOS (Animate On Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Animations and themes CSS -->
+    <link rel="stylesheet" href="animations.css">
+    <style>
+        /* ========== BASE STYLES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button, .btn {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 600;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* Header Styles */
+        header {
+            background-color: var(--header-color);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            position: relative;
+            padding: 5px 0;
+            font-weight: 500;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .theme-toggle, .cart-icon, .sign-in-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        .cart-icon {
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            animation: pulse-badge 2s infinite;
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: var(--header-color);
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: none;
+        }
+        .mobile-nav.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .mobile-nav-links a {
+            color: white;
+            padding: 10px 0;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Page Title Section */
+        .page-title {
+            background-color: var(--secondary-color);
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        .breadcrumb a:hover {
+            color: var(--accent-color);
+        }
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        .faq-categories {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 10px 20px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .category-btn.active, .category-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .faq-question {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .faq-question h3 {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .faq-toggle {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .faq-answer p {
+            padding-bottom: 20px;
+            color: var(--text-color);
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        .faq-item.active .faq-question {
+            background-color: var(--secondary-color);
+        }
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-top: 10px;
+        }
+        /* Contact Section */
+        .contact-section {
+            padding: 80px 0;
+            background-color: var(--secondary-color);
+        }
+        .contact-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .contact-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .contact-text {
+            max-width: 700px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        .contact-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .contact-btn:hover {
+            background-color: var(--hover-color);
+        }
+        /* Footer */
+        footer {
+            background-color: var(--footer-color);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .footer-newsletter p {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        .footer-newsletter-form {
+            display: flex;
+        }
+        .footer-newsletter-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 0;
+        }
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .footer-newsletter-input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .footer-newsletter-btn {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+        }
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .mobile-nav {
+                display: block;
+            }
+            .contact-buttons {
+                flex-direction: column;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 10px 15px;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.8rem;
+            }
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <!-- Theme Menu -->
+    <div class="theme-menu">
+        <h3 class="theme-menu-title">Choose a Theme</h3>
+        <div class="theme-options">
+            <div class="theme-option light-theme active" data-theme="light">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Light</div>
+            </div>
+            <div class="theme-option dark-theme" data-theme="dark">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Dark</div>
+            </div>
+            <div class="theme-option desert-theme" data-theme="desert">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Desert Sand</div>
+            </div>
+            <div class="theme-option hunter-theme" data-theme="hunter">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Hunter Green</div>
+            </div>
+            <div class="theme-option copper-theme" data-theme="copper">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Burnt Copper</div>
+            </div>
+            <div class="theme-option neon-theme" data-theme="neon">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Neon</div>
+            </div>
+            <div class="theme-option pastel-theme" data-theme="pastel">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Pastel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-box-open"></i>
+                <span>UniEssentials</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="faq.html" class="active">FAQ</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <button class="cart-icon" id="cart-icon" aria-label="Shopping cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="sign-in-btn" id="sign-in-btn" aria-label="Sign in">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="faq.html">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <h1 class="animate__animated animate__fadeInDown">Frequently Asked Questions</h1>
+            <div class="breadcrumb animate__animated animate__fadeInUp animate__delay-1s">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>FAQ</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section section" data-animated-bg="true">
+        <div class="container">
+            <!-- FAQ Categories -->
+            <div class="faq-categories" data-aos="fade-up">
+                <button class="category-btn active" data-category="all">All Questions</button>
+                <button class="category-btn" data-category="orders">Orders & Shipping</button>
+                <button class="category-btn" data-category="products">Products</button>
+                <button class="category-btn" data-category="payments">Payments</button>
+                <button class="category-btn" data-category="returns">Returns & Refunds</button>
+                <button class="category-btn" data-category="account">Account</button>
+            </div>
+            
+            <div class="faq-container">
+                <!-- Orders & Shipping FAQs -->
+                <div class="faq-item" data-category="orders" data-aos="fade-up" data-aos-delay="100">
+                    <div class="faq-question">
+                        <h3>How long does delivery take?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Standard delivery to university campuses takes 1-3 business days. For off-campus addresses, delivery typically takes 3-5 business days. We also offer express delivery options at checkout for an additional fee.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="orders" data-aos="fade-up" data-aos-delay="150">
+                    <div class="faq-question">
+                        <h3>Can I track my order?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, once your order is dispatched, you will receive a confirmation email with a tracking number and link. You can also track your order by logging into your account and viewing your order history.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="orders" data-aos="fade-up" data-aos-delay="200">
+                    <div class="faq-question">
+                        <h3>Do you ship internationally?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Currently, we only ship within the UK. We are working on expanding our shipping options to include international destinations in the near future. Sign up for our newsletter to be notified when international shipping becomes available.</p>
+                    </div>
+                </div>
+                
+                <!-- Products FAQs -->
+                <div class="faq-item" data-category="products" data-aos="fade-up" data-aos-delay="250">
+                    <div class="faq-question">
+                        <h3>How do I customize my care package?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can customize your care package by selecting the "Customize" option on any of our standard packages. From there, you can add or remove items based on your preferences. If you need a completely custom package, please contact our customer service team.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="products" data-aos="fade-up" data-aos-delay="300">
+                    <div class="faq-question">
+                        <h3>Are your products suitable for people with allergies?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer allergen-free options for many of our packages. When customizing your care package, you can specify any allergies or dietary restrictions, and we'll ensure your package is safe for you. All our products come with detailed ingredient information.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="products" data-aos="fade-up" data-aos-delay="350">
+                    <div class="faq-question">
+                        <h3>Where do you source your products?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We source our products from local vendors and small businesses across the UK. We prioritize high-quality, sustainable, and ethically produced items. Each product is carefully selected to ensure it meets our quality standards and supports local communities.</p>
+                    </div>
+                </div>
+                
+                <!-- Payments FAQs -->
+                <div class="faq-item" data-category="payments" data-aos="fade-up" data-aos-delay="400">
+                    <div class="faq-question">
+                        <h3>What payment methods do you accept?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept all major credit and debit cards (Visa, Mastercard, American Express), PayPal, and Apple Pay. All payments are processed securely through our payment gateway.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="payments" data-aos="fade-up" data-aos-delay="450">
+                    <div class="faq-question">
+                        <h3>Is my payment information secure?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we take security very seriously. Our website uses SSL encryption to protect your personal and payment information. We do not store your full credit card details on our servers. All payment processing is handled by trusted third-party payment processors that comply with PCI DSS standards.</p>
+                    </div>
+                </div>
+                
+                <!-- Returns & Refunds FAQs -->
+                <div class="faq-item" data-category="returns" data-aos="fade-up" data-aos-delay="500">
+                    <div class="faq-question">
+                        <h3>What is your return policy?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept returns within 14 days of delivery for unopened and unused items. Due to the nature of our products, we cannot accept returns for food items or personal care products that have been opened. Please contact our customer service team to initiate a return.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="returns" data-aos="fade-up" data-aos-delay="550">
+                    <div class="faq-question">
+                        <h3>How do I request a refund?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>To request a refund, please contact our customer service team with your order number and reason for the refund. Once your return is received and inspected, we will process your refund. The refund will be credited back to your original payment method within 5-7 business days.</p>
+                    </div>
+                </div>
+                
+                <!-- Account FAQs -->
+                <div class="faq-item" data-category="account" data-aos="fade-up" data-aos-delay="600">
+                    <div class="faq-question">
+                        <h3>How do I create an account?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can create an account by clicking the "Sign In" button in the top-right corner of the website and selecting "Create Account". You'll need to provide your name, email address, and create a password. You can also create an account during the checkout process.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="account" data-aos="fade-up" data-aos-delay="650">
+                    <div class="faq-question">
+                        <h3>Can I send a care package to someone else?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely! Many of our customers are parents, friends, or relatives sending care packages to students. During checkout, you can specify a different shipping address and even include a personalized message with your gift.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="account" data-aos="fade-up" data-aos-delay="700">
+                    <div class="faq-question">
+                        <h3>Do you offer subscription services?</h3>
+                        <div class="faq-toggle">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer monthly subscription plans for regular care package deliveries. You can choose between our Monthly Essentials, Bi-Monthly Boost, or Quarterly Care packages. Subscriptions can be paused or canceled at any time from your account dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section section">
+        <div class="container">
+            <div class="contact-content">
+                <h2 class="contact-title" data-aos="fade-up">Didn't Find Your Answer?</h2>
+                <p class="contact-text" data-aos="fade-up" data-aos-delay="100">If you couldn't find the answer to your question, our customer support team is here to help. Reach out to us through one of the options below and we'll get back to you as soon as possible.</p>
+                <div class="contact-buttons" data-aos="fade-up" data-aos-delay="200">
+                    <a href="contact.html" class="contact-btn">
+                        <i class="fas fa-envelope"></i>
+                        Contact Us
+                    </a>
+                    <a href="tel:+4407756741791" class="contact-btn">
+                        <i class="fas fa-phone"></i>
+                        Call Us
+                    </a>
+                    <a href="https://wa.me/4407756741791" class="contact-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="products.html">Products</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="faq.html">FAQ</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Categories</h3>
+                    <div class="footer-links">
+                        <a href="products.html#snacks">Snack Packs</a>
+                        <a href="products.html#personal-care">Personal Care</a>
+                        <a href="products.html#stationery">Stationery</a>
+                        <a href="products.html#comfort">Comfort Items</a>
+                        <a href="products.html#wellness">Wellness Products</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
+                    <h3>Help & Support</h3>
+                    <div class="footer-links">
+                        <a href="#">Shipping Information</a>
+                        <a href="#">Returns Policy</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-column footer-newsletter" data-aos="fade-up" data-aos-delay="400">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                    <form class="footer-newsletter-form">
+                        <input type="email" class="footer-newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="footer-newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 UniEssentials. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cookie Policy Popup -->
+    <div class="cookie-popup" id="cookie-popup">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <h3>Cookie Policy</h3>
+                <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept", you consent to our use of cookies as described in our Cookie Policy.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn accept-cookies" id="accept-cookies">Accept</button>
+                <button class="cookie-btn decline-cookies" id="decline-cookies">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="animations.js"></script>
+    <script src="theme-fix.js"></script>
+    <script src="products-db.js"></script>
+    <script src="cart.js"></script>
+    <script src="fix-loading.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: false,
+                mirror: false
+            });
+            
+            // FAQ toggles
+            const faqItems = document.querySelectorAll('.faq-item');
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                if (question) {
+                    question.addEventListener('click', () => {
+                        // Close all other open FAQs
+                        faqItems.forEach(otherItem => {
+                            if (otherItem !== item && otherItem.classList.contains('active')) {
+                                otherItem.classList.remove('active');
+                            }
+                        });
+                        
+                        // Toggle current FAQ
+                        item.classList.toggle('active');
+                    });
+                }
+            });
+            
+            // FAQ category filtering
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active button
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter FAQs
+                    faqItems.forEach(item => {
+                        if (category === 'all' || item.getAttribute('data-category') === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Newsletter subscription
+            const footerNewsletterForm = document.querySelector('.footer-newsletter-form');
+            if (footerNewsletterForm) {
+                footerNewsletterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = footerNewsletterForm.querySelector('.footer-newsletter-input').value;
+                    showNotification('Subscription Successful', `Thank you for subscribing to our newsletter with ${email}.`);
+                    footerNewsletterForm.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

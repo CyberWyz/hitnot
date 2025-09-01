@@ -46,14 +46,15 @@ $asset_query = mysqli_query($con, "SELECT * FROM assets WHERE reg_number='$res_R
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
-    <link rel="stylesheet" href="style/home.css">
-    <link rel="stylesheet" href="responsive.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Home</title>
    
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
+
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="sidebar">
@@ -456,6 +457,7 @@ $asset_query = mysqli_query($con, "SELECT * FROM assets WHERE reg_number='$res_R
         </div>
     </div>
     </div> <!-- End of your main container -->
+    <script src="js/particles.js"></script>
     <script src="js/home.js"></script>
 </body>
 </html>

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - UniEssentials</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for enhanced animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- AOS (Animate On Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        /* ========== BASE STYLES ========== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button,
+        .btn {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4a6fa5;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* ========== HEADER STYLES ========== */
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            position: relative;
+            padding: 5px 0;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .theme-toggle,
+        .cart-icon,
+        .sign-in-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .cart-icon {
+            position: relative;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Mobile Navigation */
+        
+        .mobile-nav {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: none;
+        }
+        
+        .mobile-nav.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .mobile-nav-links a {
+            color: white;
+            padding: 10px 0;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* ========== PAGE TITLE ========== */
+        
+        .page-title {
+            background-color: #ecf0f1;
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+        
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            color: #7f8c8d;
+        }
+        
+        .breadcrumb a:hover {
+            color: #e74c3c;
+        }
+        /* ========== FILTER SECTION ========== */
+        
+        .filter-section {
+            padding: 40px 0;
+            background-color: #f5f5f5;
+        }
+        
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        .sort-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sort-label {
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .sort-select {
+            padding: 8px 15px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .search-container {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        /* ========== PRODUCTS GRID ========== */
+        
+        .products-section {
+            padding: 40px 0 80px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        
+        .product-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .product-details {
+            padding: 20px;
+        }
+        
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .product-description {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .add-to-cart {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #3a5a80;
+        }
+        
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stars {
+            color: #ffc107;
+        }
+        
+        .rating-count {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        /* ========== PAGINATION ========== */
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 50px;
+        }
+        
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background-color: #ecf0f1;
+        }
+        /* ========== FEATURED COLLECTIONS ========== */
+        
+        .featured-collections {
+            padding: 80px 0;
+            background-color: #ecf0f1;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            color: #2c3e50;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #e74c3c;
+            border-radius: 2px;
+        }
+        
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .collection-card {
+            position: relative;
+            height: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .collection-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            transition: transform 0.5s ease;
+        }
+        
+        .collection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            color: white;
+        }
+        
+        .collection-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .collection-description {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .collection-btn {
+            background-color: white;
+            color: #2c3e50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            width: fit-content;
+        }
+        
+        .collection-card:hover .collection-image {
+            transform: scale(1.1);
+        }
+        /* ========== NEWSLETTER SECTION ========== */
+        
+        .newsletter-section {
+            padding: 80px 0;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .newsletter-text {
+            margin-bottom: 30px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .newsletter-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background-color: white;
+            color: #333;
+        }
+        
+        .newsletter-input::placeholder {
+            color: #7f8c8d;
+        }
+        
+        .newsletter-btn {
+            padding: 0 25px;
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* ========== FOOTER ========== */
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: #e74c3c;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer-newsletter p {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .footer-newsletter-form {
+            display: flex;
+        }
+        
+        .footer-newsletter-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .footer-newsletter-btn {
+            padding: 10px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        /* No results message */
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+        }
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .mobile-nav {
+                display: block;
+            }
+            .filter-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .filter-options {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                justify-content: flex-start;
+            }
+            .sort-container {
+                margin-left: auto;
+            }
+            .collection-card {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 10px 15px;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.8rem;
+            }
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .newsletter-form {
+                flex-direction: column;
+            }
+            .newsletter-input {
+                border-radius: 5px 5px 0 0;
+            }
+            .newsletter-btn {
+                border-radius: 0 0 5px 5px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-box-open"></i>
+                <span>UniEssentials</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html" class="active">Products</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="faq.html">FAQ</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <button class="cart-icon" id="cart-icon" aria-label="Shopping cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="sign-in-btn" id="sign-in-btn" aria-label="Sign in">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="faq.html">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <h1 class="animate__animated animate__fadeInDown">Our Products</h1>
+            <div class="breadcrumb animate__animated animate__fadeInUp animate__delay-1s">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>Products</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-container">
+                <div class="filter-options">
+                    <button class="filter-btn active" data-category="all">All Products</button>
+                    <button class="filter-btn" data-category="snacks">Snack Packs</button>
+                    <button class="filter-btn" data-category="personal-care">Personal Care</button>
+                    <button class="filter-btn" data-category="stationery">Stationery</button>
+                    <button class="filter-btn" data-category="comfort">Comfort Items</button>
+                    <button class="filter-btn" data-category="wellness">Wellness</button>
+                </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search products...">
+                </div>
+                <div class="sort-container">
+                    <span class="sort-label">Sort by:</span>
+                    <select class="sort-select">
+                        <option value="popularity">Popularity</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section section">
+        <div class="container">
+            <div class="products-grid" id="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card" data-category="snacks">
+                    <span class="product-category">Snack Packs</span>
+                    <img src="https://images.unsplash.com/photo-1550583724-b2692b85b150" alt="Study Snack Pack" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Study Snack Pack</h3>
+                        <p class="product-description">A curated selection of brain-boosting snacks perfect for late-night study sessions.</p>
+                        <div class="product-price">£12.99</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="1" data-name="Study Snack Pack" data-price="12.99">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="rating-count">(42)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card" data-category="personal-care">
+                    <span class="product-category">Personal Care</span>
+                    <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883" alt="Shower Caddy" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Premium Shower Caddy</h3>
+                        <p class="product-description">Durable shower caddy with multiple compartments for all your toiletries.</p>
+                        <div class="product-price">£18.50</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="2" data-name="Premium Shower Caddy" data-price="18.50">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="rating-count">(36)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card" data-category="stationery">
+                    <span class="product-category">Stationery</span>
+                    <img src="https://images.unsplash.com/photo-1585336261022-680e295ce3fe" alt="Notebook Set" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Premium Notebook Set</h3>
+                        <p class="product-description">Set of 3 high-quality notebooks with durable covers and premium paper.</p>
+                        <div class="product-price">£15.99</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="3" data-name="Premium Notebook Set" data-price="15.99">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-count">(58)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card" data-category="comfort">
+                    <span class="product-category">Comfort Items</span>
+                    <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6" alt="Memory Foam Pillow" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Memory Foam Pillow</h3>
+                        <p class="product-description">Ergonomic memory foam pillow for optimal neck support and comfort.</p>
+                        <div class="product-price">£24.99</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="4" data-name="Memory Foam Pillow" data-price="24.99">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="rating-count">(29)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="product-card" data-category="wellness">
+                    <span class="product-category">Wellness</span>
+                    <img src="https://images.unsplash.com/photo-1597045566677-8cf032ed6634" alt="Essential Oil Diffuser" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Essential Oil Diffuser</h3>
+                        <p class="product-description">Ultrasonic diffuser with color changing LED lights for relaxation.</p>
+                        <div class="product-price">£22.50</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="5" data-name="Essential Oil Diffuser" data-price="22.50">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="rating-count">(31)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="product-card" data-category="snacks">
+                    <span class="product-category">Snack Packs</span>
+                    <img src="https://images.unsplash.com/photo-1550583724-b2692b85b150" alt="Energy Boost Pack" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Energy Boost Pack</h3>
+                        <p class="product-description">Healthy snacks packed with energy to keep you going through long lectures.</p>
+                        <div class="product-price">£10.99</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="6" data-name="Energy Boost Pack" data-price="10.99">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="rating-count">(47)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 7 -->
+                <div class="product-card" data-category="personal-care">
+                    <span class="product-category">Personal Care</span>
+                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c" alt="Travel Toiletry Kit" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Travel Toiletry Kit</h3>
+                        <p class="product-description">Compact toiletry kit with leak-proof bottles for weekend trips home.</p>
+                        <div class="product-price">£14.75</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="7" data-name="Travel Toiletry Kit" data-price="14.75">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="rating-count">(23)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 8 -->
+                <div class="product-card" data-category="stationery">
+                    <span class="product-category">Stationery</span>
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136" alt="Pen and Highlighter Set" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">Pen & Highlighter Set</h3>
+                        <p class="product-description">Premium writing set with smooth-flowing pens and vibrant highlighters.</p>
+                        <div class="product-price">£9.99</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart" data-id="8" data-name="Pen & Highlighter Set" data-price="9.99">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <div class="product-rating">
+                                <div class="stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="rating-count">(51)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <button class="page-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Collections -->
+    <section class="featured-collections section">
+        <div class="container">
+            <h2 class="section-title">Featured Collections</h2>
+            <div class="collections-grid">
+                <!-- Collection 1 -->
+                <div class="collection-card">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1" alt="Fresher's Welcome Pack" class="collection-image">
+                    <div class="collection-overlay">
+                        <h3 class="collection-title">Fresher's Welcome Pack</h3>
+                        <p class="collection-description">Everything a first-year student needs to settle into university life.</p>
+                        <a href="#" class="collection-btn">
+                            <i class="fas fa-arrow-right"></i> View Collection
+                        </a>
+                    </div>
+                </div>
+                <!-- Collection 2 -->
+                <div class="collection-card">
+                    <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8" alt="Exam Season Bundle" class="collection-image">
+                    <div class="collection-overlay">
+                        <h3 class="collection-title">Exam Season Bundle</h3>
+                        <p class="collection-description">Support for those stressful exam periods with brain food and stress relief.</p>
+                        <a href="#" class="collection-btn">
+                            <i class="fas fa-arrow-right"></i> View Collection
+                        </a>
+                    </div>
+                </div>
+                <!-- Collection 3 -->
+                <div class="collection-card">
+                    <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597" alt="Self-Care Essentials" class="collection-image">
+                    <div class="collection-overlay">
+                        <h3 class="collection-title">Self-Care Essentials</h3>
+                        <p class="collection-description">Wellness and self-care products for maintaining good mental health.</p>
+                        <a href="#" class="collection-btn">
+                            <i class="fas fa-arrow-right"></i> View Collection
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title">Stay Updated</h2>
+                <p class="newsletter-text">Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="products.html">Products</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="faq.html">FAQ</a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <div class="footer-links">
+                        <a href="#snacks">Snack Packs</a>
+                        <a href="#personal-care">Personal Care</a>
+                        <a href="#stationery">Stationery</a>
+                        <a href="#comfort">Comfort Items</a>
+                        <a href="#wellness">Wellness Products</a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Help & Support</h3>
+                    <div class="footer-links">
+                        <a href="#">Shipping Information</a>
+                        <a href="#">Returns Policy</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-column footer-newsletter">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                    <form class="footer-newsletter-form">
+                        <input type="email" class="footer-newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="footer-newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 UniEssentials. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="fix-loading.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="animations.js"></script>
+    <script src="theme-fix.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: false,
+            mirror: false
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.querySelector('.mobile-nav');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileNav.classList.toggle('active');
+        });
+
+        // Filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const searchInput = document.querySelector('.search-input');
+            const sortSelect = document.querySelector('.sort-select');
+            const productCards = document.querySelectorAll('.product-card');
+
+            // Filter products by category
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    const category = this.getAttribute('data-category');
+                    filterProducts(category, searchInput.value.trim(), sortSelect.value);
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const activeFilter = document.querySelector('.filter-btn.active');
+                const category = activeFilter.getAttribute('data-category');
+                filterProducts(category, this.value.trim(), sortSelect.value);
+            });
+
+            // Sort functionality
+            sortSelect.addEventListener('change', function() {
+                const activeFilter = document.querySelector('.filter-btn.active');
+                const category = activeFilter.getAttribute('data-category');
+                filterProducts(category, searchInput.value.trim(), this.value);
+            });
+
+            // Filter and sort products
+            function filterProducts(category, searchQuery, sortBy) {
+                let visibleProducts = 0;
+
+                productCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    const title = card.querySelector('.product-title').textContent.toLowerCase();
+                    const description = card.querySelector('.product-description').textContent.toLowerCase();
+
+                    // Category filter
+                    const categoryMatch = category === 'all' || cardCategory === category;
+
+                    // Search filter
+                    const searchMatch = !searchQuery ||
+                        title.includes(searchQuery.toLowerCase()) ||
+                        description.includes(searchQuery.toLowerCase());
+
+                    if (categoryMatch && searchMatch) {
+                        card.style.display = 'block';
+                        visibleProducts++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Show no results message if no products match
+                const noResults = document.querySelector('.no-results');
+                if (visibleProducts === 0) {
+                    if (!noResults) {
+                        const productsGrid = document.getElementById('products-grid');
+                        const message = document.createElement('div');
+                        message.className = 'no-results';
+                        message.textContent = 'No products found matching your criteria';
+                        productsGrid.appendChild(message);
+                    }
+                } else if (noResults) {
+                    noResults.remove();
+                }
+
+                // Sort products
+                sortProducts(sortBy);
+            }
+
+            // Sort products
+            function sortProducts(sortBy) {
+                const productsGrid = document.getElementById('products-grid');
+                const productCards = Array.from(document.querySelectorAll('.product-card[style="display: block"]'));
+
+                productCards.sort((a, b) => {
+                    const priceA = parseFloat(a.querySelector('.product-price').textContent.replace('£', ''));
+                    const priceB = parseFloat(b.querySelector('.product-price').textContent.replace('£', ''));
+                    const ratingA = parseFloat(a.querySelector('.stars').textContent);
+                    const ratingB = parseFloat(b.querySelector('.stars').textContent);
+
+                    switch (sortBy) {
+                        case 'price-low':
+                            return priceA - priceB;
+                        case 'price-high':
+                            return priceB - priceA;
+                        case 'newest':
+                            // Assuming newer products come later in the HTML
+                            return 1;
+                        case 'popularity':
+                        default:
+                            // Sort by rating (simplified for this example)
+                            return ratingB - ratingA;
+                    }
+                });
+
+                // Re-append sorted products
+                productCards.forEach(card => {
+                    productsGrid.appendChild(card);
+                });
+            }
+
+            // Add to cart functionality
+            const cartCount = document.querySelector('.cart-count');
+            let cartItems = 0;
+
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    cartItems++;
+                    cartCount.textContent = cartItems;
+
+                    const productName = this.getAttribute('data-name');
+                    alert(`${productName} has been added to your cart!`);
+                });
+            });
+
+            // Newsletter form submission
+            const newsletterForm = document.querySelector('.newsletter-form');
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const email = this.querySelector('.newsletter-input').value;
+                    alert(`Thank you for subscribing with ${email}!`);
+                    this.reset();
+                });
+            }
+
+            // Footer newsletter form submission
+            const footerNewsletterForm = document.querySelector('.footer-newsletter-form');
+            if (footerNewsletterForm) {
+                footerNewsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const email = this.querySelector('.footer-newsletter-input').value;
+                    alert(`Thank you for subscribing with ${email}!`);
+                    this.reset();
+                });
+            }
+
+            // Pagination functionality
+            const paginationButtons = document.querySelectorAll('.page-btn');
+
+            paginationButtons.forEach((button, index) => {
+                if (index < 3) { // Only for numbered buttons
+                    button.addEventListener('click', function() {
+                        paginationButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        alert(`Showing page ${index + 1}`);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

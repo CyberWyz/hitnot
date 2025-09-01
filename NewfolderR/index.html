@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniEssentials - Student Care Packages</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for enhanced animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- AOS (Animate On Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Animations and themes CSS -->
+    <link rel="stylesheet" href="animations.css">
+    <style>
+        /* ========== BASE STYLES ========== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: var(--background-texture);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button,
+        .btn {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 600;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* ========== HEADER STYLES ========== */
+        
+        header {
+            background-color: var(--header-color);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        
+        header.scrolled {
+            background-color: rgba(var(--primary-color-rgb), 0.95);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            position: relative;
+            padding: 5px 0;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .theme-toggle,
+        .cart-icon,
+        .sign-in-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .cart-icon {
+            position: relative;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            animation: pulse-badge 2s infinite;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Mobile Navigation */
+        
+        .mobile-nav {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: var(--header-color);
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: none;
+        }
+        
+        .mobile-nav.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .mobile-nav-links a {
+            color: white;
+            padding: 10px 0;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* ========== HERO SECTION ========== */
+        
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            background-image: linear-gradient(to bottom right, var(--primary-color), var(--accent-color));
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .primary-btn {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .secondary-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 2rem;
+            animation: float 2s ease infinite;
+            cursor: pointer;
+            z-index: 2;
+        }
+        /* ========== FEATURED PRODUCTS SECTION ========== */
+        
+        .featured-products {
+            padding: 100px 0;
+            background-color: var(--background-color);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        
+        .product-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .product-details {
+            padding: 20px;
+        }
+        
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        
+        .product-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .add-to-cart {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stars {
+            color: #ffc107;
+        }
+        
+        .rating-count {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        /* ========== HOW IT WORKS SECTION ========== */
+        
+        .how-it-works {
+            padding: 100px 0;
+            background-color: var(--secondary-color);
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            padding: 0 15px;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        
+        .step-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        /* ========== TESTIMONIALS SECTION ========== */
+        
+        .testimonials {
+            padding: 100px 0;
+            background-color: var(--background-color);
+        }
+        
+        .testimonial-slider {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .testimonial-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 0 20px;
+        }
+        
+        .testimonial-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            background-color: #f0f0f0;
+            border: 4px solid var(--accent-color);
+        }
+        
+        .testimonial-rating {
+            margin-bottom: 15px;
+            color: #ffc107;
+        }
+        
+        .testimonial-content {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .testimonial-position {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .testimonial-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .testimonial-control {
+            width: 40px;
+            height: 40px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .testimonial-indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .testimonial-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .testimonial-indicator.active {
+            background-color: var(--accent-color);
+        }
+        /* ========== CTA SECTION ========== */
+        
+        .cta-section {
+            padding: 100px 0;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://picsum.photos/1600/800');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .cta-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .cta-primary-btn {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cta-secondary-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* ========== NEWSLETTER SECTION ========== */
+        
+        .newsletter-section {
+            padding: 80px 0;
+            background-color: var(--secondary-color);
+            text-align: center;
+        }
+        
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .newsletter-text {
+            margin-bottom: 30px;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: var(--card-shadow);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .newsletter-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background-color: var(--card-color);
+            color: var(--text-color);
+        }
+        
+        .newsletter-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .newsletter-btn {
+            padding: 0 25px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* ========== FOOTER ========== */
+        
+        footer {
+            background-color: var(--footer-color);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer-newsletter p {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .footer-newsletter-form {
+            display: flex;
+        }
+        
+        .footer-newsletter-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .footer-newsletter-input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-newsletter-btn {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .mobile-nav {
+                display: block;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .steps-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            .steps-container::before {
+                display: none;
+            }
+            .cta-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 10px 15px;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.8rem;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .newsletter-form {
+                flex-direction: column;
+            }
+            .newsletter-input {
+                border-radius: 5px 5px 0 0;
+            }
+            .newsletter-btn {
+                border-radius: 0 0 5px 5px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <!-- Theme Menu -->
+    <div class="theme-menu">
+        <h3 class="theme-menu-title">Choose a Theme</h3>
+        <div class="theme-options">
+            <div class="theme-option light-theme active" data-theme="light">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Light</div>
+            </div>
+            <div class="theme-option dark-theme" data-theme="dark">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Dark</div>
+            </div>
+            <div class="theme-option desert-theme" data-theme="desert">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Desert Sand</div>
+            </div>
+            <div class="theme-option hunter-theme" data-theme="hunter">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Hunter Green</div>
+            </div>
+            <div class="theme-option copper-theme" data-theme="copper">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Burnt Copper</div>
+            </div>
+            <div class="theme-option neon-theme" data-theme="neon">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Neon</div>
+            </div>
+            <div class="theme-option pastel-theme" data-theme="pastel">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Pastel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-box-open"></i>
+                <span>UniEssentials</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="faq.html">FAQ</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <button class="cart-icon" id="cart-icon" aria-label="Shopping cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="sign-in-btn" id="sign-in-btn" aria-label="Sign in">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="faq.html">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div id="particles-js"></div>
+        <div class="hero-content">
+            <h1 class="hero-title animate__animated animate__fadeInDown">Student Care Packages for University Life</h1>
+            <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">Personalized essentials to make university life easier, healthier, and more enjoyable.</p>
+            <div class="hero-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                <a href="products.html" class="primary-btn">
+                    <i class="fas fa-shopping-bag"></i> Shop Now
+                </a>
+                <a href="#how-it-works" class="secondary-btn">
+                    <i class="fas fa-info-circle"></i> How It Works
+                </a>
+            </div>
+        </div>
+        <a href="#featured-products" class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </a>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="featured-products section" id="featured-products" data-animated-bg="true">
+        <div class="container">
+            <h2 class="section-title" data-aos="zoom-in">Featured Products</h2>
+            <div class="products-grid">
+                <!-- Products will be dynamically loaded here via products-db.js -->
+
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works section" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title" data-aos="zoom-in">How It Works</h2>
+            <div class="steps-container">
+                <!-- Step 1 -->
+                <div class="step" data-aos="fade-up" data-aos-delay="100">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Browse & Select</h3>
+                    <p class="step-description">Browse our curated selection of care packages or create your own custom package.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step" data-aos="fade-up" data-aos-delay="200">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Customize</h3>
+                    <p class="step-description">Personalize your package with additional items or special requests.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Delivery</h3>
+                    <p class="step-description">We deliver your care package directly to your university accommodation.</p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step" data-aos="fade-up" data-aos-delay="400">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Enjoy</h3>
+                    <p class="step-description">Unbox your essentials and enjoy a better university experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials section">
+        <div class="container">
+            <h2 class="section-title" data-aos="zoom-in">What Students Say</h2>
+            <div class="testimonial-slider" data-aos="fade-up">
+                <div class="testimonial-slides">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-content">"The Exam Season Bundle was a lifesaver during my finals. The snacks kept me going, and the stress relief items helped me stay calm. Highly recommend! plus panodawo ka dragon"</p>
+                            <h4 class="testimonial-author">Supernova </h4>
+                            <p class="testimonial-position">IT Student, HIT</p>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="testimonial-content">"As a first-year student, the Fresher's Welcome Pack made settling into university so much easier. It had everything I needed and saved me multiple trips to the shops."</p>
+                            <h4 class="testimonial-author">James Chimuti</h4>
+                            <p class="testimonial-position">Computer Science Student, Harare Intstitute of Technology</p>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-content">"The quality of products in my Dorm Room Comfort Pack was excellent. The delivery was quick, and the customer service was responsive when I had questions."</p>
+                            <h4 class="testimonial-author">Emma Chido</h4>
+                            <p class="testimonial-position">Psychology Student, HIT University</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial Controls -->
+                <div class="testimonial-controls">
+                    <div class="testimonial-control prev-testimonial">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="testimonial-control next-testimonial">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <!-- Testimonial Indicators -->
+                <div class="testimonial-indicators">
+                    <div class="testimonial-indicator active" data-index="0"></div>
+                    <div class="testimonial-indicator" data-index="1"></div>
+                    <div class="testimonial-indicator" data-index="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section section">
+        <div class="cta-background"></div>
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-aos="fade-up">Ready to Make University Life Better?</h2>
+                <p class="cta-text" data-aos="fade-up" data-aos-delay="100">Start with a care package tailored to your needs or send one to a student you care about.</p>
+                <div class="cta-buttons" data-aos="fade-up" data-aos-delay="200">
+                    <a href="products.html" class="cta-primary-btn">
+                        <i class="fas fa-shopping-bag"></i> Shop Now
+                    </a>
+                    <a href="contact.html" class="cta-secondary-btn">
+                        <i class="fas fa-envelope"></i> Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title" data-aos="fade-up">Stay Updated</h2>
+                <p class="newsletter-text" data-aos="fade-up" data-aos-delay="100">Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                <form class="newsletter-form" data-aos="fade-up" data-aos-delay="200">
+                    <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="products.html">Products</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="faq.html">FAQ</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Categories</h3>
+                    <div class="footer-links">
+                        <a href="products.html#snacks">Snack Packs</a>
+                        <a href="products.html#personal-care">Personal Care</a>
+                        <a href="products.html#stationery">Stationery</a>
+                        <a href="products.html#comfort">Comfort Items</a>
+                        <a href="products.html#wellness">Wellness Products</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
+                    <h3>Help & Support</h3>
+                    <div class="footer-links">
+                        <a href="#">Shipping Information</a>
+                        <a href="#">Returns Policy</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-column footer-newsletter" data-aos="fade-up" data-aos-delay="400">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                    <form class="footer-newsletter-form">
+                        <input type="email" class="footer-newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="footer-newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 UniEssentials. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cookie Policy Popup -->
+    <div class="cookie-popup" id="cookie-popup">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <h3>Cookie Policy</h3>
+                <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept", you consent to our use of cookies as described in our Cookie Policy.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn accept-cookies" id="accept-cookies">Accept</button>
+                <button class="cookie-btn decline-cookies" id="decline-cookies">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="switching/page-transition.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="animations.js"></script>
+    <script src="theme-fix.js"></script>
+    <script src="products-db.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        // Add this inside your existing DOMContentLoaded event listener
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.querySelector('.mobile-nav');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileNav.classList.toggle('active');
+            // Optional: Toggle icon between bars and X
+            const icon = mobileMenuBtn.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.replace('fa-bars', 'fa-times');
+            } else {
+                icon.classList.replace('fa-times', 'fa-bars');
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: false,
+                mirror: false
+            });
+
+            // Initialize variables
+            let currentTestimonialIndex = 0;
+
+            // DOM Elements
+            const testimonialSlides = document.querySelector('.testimonial-slides');
+            const testimonialIndicators = document.querySelectorAll('.testimonial-indicator');
+            const prevTestimonialBtn = document.querySelector('.prev-testimonial');
+            const nextTestimonialBtn = document.querySelector('.next-testimonial');
+            const newsletterForm = document.querySelector('.newsletter-form');
+            const footerNewsletterForm = document.querySelector('.footer-newsletter-form');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+
+            // Testimonial slider functionality
+            function updateTestimonialSlider() {
+                testimonialSlides.style.transform = `translateX(-${currentTestimonialIndex * 100}%)`;
+
+                testimonialIndicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === currentTestimonialIndex);
+                });
+            }
+
+            prevTestimonialBtn.addEventListener('click', () => {
+                currentTestimonialIndex = (currentTestimonialIndex - 1 + 3) % 3;
+                updateTestimonialSlider();
+            });
+
+            nextTestimonialBtn.addEventListener('click', () => {
+                currentTestimonialIndex = (currentTestimonialIndex + 1) % 3;
+                updateTestimonialSlider();
+            });
+
+            testimonialIndicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', () => {
+                    currentTestimonialIndex = index;
+                    updateTestimonialSlider();
+                });
+            });
+
+            // Auto rotate testimonials
+            setInterval(() => {
+                currentTestimonialIndex = (currentTestimonialIndex + 1) % 3;
+                updateTestimonialSlider();
+            }, 5000);
+
+            // Smooth scroll for scroll indicator
+            scrollIndicator.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = scrollIndicator.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                window.scrollTo({
+                    top: targetElement.offsetTop,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Newsletter subscription
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = newsletterForm.querySelector('.newsletter-input').value;
+                showNotification('Subscription Successful', `Thank you for subscribing to our newsletter with ${email}.`);
+                newsletterForm.reset();
+            });
+
+            footerNewsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = footerNewsletterForm.querySelector('.footer-newsletter-input').value;
+                showNotification('Subscription Successful', `Thank you for subscribing to our newsletter with ${email}.`);
+                footerNewsletterForm.reset();
+            });
+
+            // Initialize particles.js
+            if (document.getElementById('particles-js')) {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: {
+                            value: 80,
+                            density: {
+                                enable: true,
+                                value_area: 800
+                            }
+                        },
+                        color: {
+                            value: '#ffffff'
+                        },
+                        shape: {
+                            type: 'circle',
+                            stroke: {
+                                width: 0,
+                                color: '#000000'
+                            },
+                            polygon: {
+                                nb_sides: 5
+                            }
+                        },
+                        opacity: {
+                            value: 0.5,
+                            random: false,
+                            anim: {
+                                enable: false,
+                                speed: 1,
+                                opacity_min: 0.1,
+                                sync: false
+                            }
+                        },
+                        size: {
+                            value: 3,
+                            random: true,
+                            anim: {
+                                enable: false,
+                                speed: 40,
+                                size_min: 0.1,
+                                sync: false
+                            }
+                        },
+                        line_linked: {
+                            enable: true,
+                            distance: 150,
+                            color: '#ffffff',
+                            opacity: 0.4,
+                            width: 1
+                        },
+                        move: {
+                            enable: true,
+                            speed: 2,
+                            direction: 'none',
+                            random: false,
+                            straight: false,
+                            out_mode: 'out',
+                            bounce: false,
+                            attract: {
+                                enable: false,
+                                rotateX: 600,
+                                rotateY: 1200
+                            }
+                        }
+                    },
+                    interactivity: {
+                        detect_on: 'canvas',
+                        events: {
+                            onhover: {
+                                enable: true,
+                                mode: 'grab'
+                            },
+                            onclick: {
+                                enable: true,
+                                mode: 'push'
+                            },
+                            resize: true
+                        },
+                        modes: {
+                            grab: {
+                                distance: 140,
+                                line_linked: {
+                                    opacity: 1
+                                }
+                            },
+                            bubble: {
+                                distance: 400,
+                                size: 40,
+                                duration: 2,
+                                opacity: 8,
+                                speed: 3
+                            },
+                            repulse: {
+                                distance: 200,
+                                duration: 0.4
+                            },
+                            push: {
+                                particles_nb: 4
+                            },
+                            remove: {
+                                particles_nb: 2
+                            }
+                        }
+                    },
+                    retina_detect: true
+                });
+            }
+
+            // Set testimonial avatars
+            document.querySelectorAll('.testimonial-avatar').forEach((img, index) => {
+                img.style.backgroundImage = `url('https://picsum.photos/200/200?random=${index + 10}')`;
+            });
+
+            // Handle header scroll effect
+            const header = document.querySelector('header');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

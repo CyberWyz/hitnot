@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - UniEssentials</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for enhanced animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- AOS (Animate On Scroll) library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Animations and themes CSS -->
+    <link rel="stylesheet" href="animations.css">
+    <style>
+        /* ========== BASE STYLES ========== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: var(--background-texture);
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        button,
+        .btn {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 600;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* ========== HEADER STYLES ========== */
+        
+        header {
+            background-color: var(--header-color);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            position: relative;
+            padding: 5px 0;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .theme-toggle,
+        .cart-icon,
+        .sign-in-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .cart-icon {
+            position: relative;
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            animation: pulse-badge 2s infinite;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* Mobile Navigation */
+        
+        .mobile-nav {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: var(--header-color);
+            padding: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: none;
+        }
+        
+        .mobile-nav.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .mobile-nav-links a {
+            color: white;
+            padding: 10px 0;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* ========== PAGE TITLE ========== */
+        
+        .page-title {
+            background-color: var(--secondary-color);
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+        
+        .page-title h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--accent-color);
+        }
+        /* ========== ABOUT INTRO SECTION ========== */
+        
+        .about-intro {
+            padding: 80px 0;
+            background-color: var(--background-color);
+        }
+        
+        .about-intro-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .about-intro-text {
+            padding-right: 20px;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .about-intro-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .about-intro-image {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            height: 400px;
+            background-color: #f0f0f0;
+            background-size: cover;
+            background-position: center;
+        }
+        /* ========== OUR MISSION SECTION ========== */
+        
+        .our-mission {
+            padding: 80px 0;
+            background-color: var(--secondary-color);
+        }
+        
+        .mission-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .mission-title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .mission-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .mission-description {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        .mission-values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .value-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .value-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        .value-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        
+        .value-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        /* ========== TEAM SECTION ========== */
+        
+        .team-section {
+            padding: 80px 0;
+            background-color: var(--background-color);
+        }
+        
+        .team-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .team-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .team-member {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+        
+        .member-image {
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #f0f0f0;
+        }
+        
+        .member-details {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .member-name {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        
+        .member-position {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .member-bio {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .member-social {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .social-link {
+            width: 35px;
+            height: 35px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        /* ========== TIMELINE SECTION ========== */
+        
+        .timeline-section {
+            padding: 80px 0;
+            background-color: var(--secondary-color);
+        }
+        
+        .timeline-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .timeline-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background-color: var(--border-color);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+        }
+        
+        .timeline-content {
+            position: relative;
+            width: 45%;
+            padding: 20px;
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-right: auto;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--card-color);
+            transform: rotate(45deg);
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--card-color);
+            transform: rotate(45deg);
+        }
+        
+        .timeline-date {
+            position: absolute;
+            top: 20px;
+            width: 100px;
+            padding: 5px 10px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-date {
+            left: -140px;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-date {
+            right: -140px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        
+        .timeline-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .timeline-description {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        /* ========== TESTIMONIALS SECTION ========== */
+        
+        .testimonials-section {
+            padding: 80px 0;
+            background-color: var(--background-color);
+        }
+        
+        .testimonials-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .testimonials-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .testimonial-slider {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .testimonial-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 0 20px;
+        }
+        
+        .testimonial-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            background-color: #f0f0f0;
+            border: 4px solid var(--accent-color);
+        }
+        
+        .testimonial-rating {
+            margin-bottom: 15px;
+            color: #ffc107;
+        }
+        
+        .testimonial-content {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .testimonial-position {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .testimonial-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .testimonial-control {
+            width: 40px;
+            height: 40px;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .testimonial-indicators {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .testimonial-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .testimonial-indicator.active {
+            background-color: var(--accent-color);
+        }
+        /* ========== CTA SECTION ========== */
+        
+        .cta-section {
+            padding: 80px 0;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://picsum.photos/1600/800');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .cta-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .cta-primary-btn {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cta-secondary-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* ========== FOOTER ========== */
+        
+        footer {
+            background-color: var(--footer-color);
+            color: white;
+            padding: 60px 0 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-color);
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .footer-newsletter p {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .footer-newsletter-form {
+            display: flex;
+        }
+        
+        .footer-newsletter-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .footer-newsletter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .footer-newsletter-input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-newsletter-btn {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        
+        .footer-bottom {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .mobile-nav {
+                display: block;
+            }
+            .about-intro-content {
+                grid-template-columns: 1fr;
+            }
+            .about-intro-text {
+                padding-right: 0;
+                order: 2;
+            }
+            .about-intro-image {
+                order: 1;
+                height: 300px;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                width: calc(100% - 50px);
+                margin-left: 50px;
+                margin-right: 0;
+            }
+            .timeline-item:nth-child(odd) .timeline-content::before,
+            .timeline-item:nth-child(even) .timeline-content::before {
+                left: -10px;
+                right: auto;
+            }
+            .timeline-item:nth-child(odd) .timeline-date,
+            .timeline-item:nth-child(even) .timeline-date {
+                left: auto;
+                right: 10px;
+                top: -30px;
+                width: auto;
+            }
+            .timeline-dot {
+                left: 20px;
+            }
+            .cta-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-container {
+                padding: 10px 15px;
+            }
+            .logo {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.8rem;
+            }
+            .page-title h1 {
+                font-size: 2rem;
+            }
+            .section-title,
+            .mission-title,
+            .team-title,
+            .timeline-title,
+            .testimonials-title,
+            .cta-title {
+                font-size: 2rem;
+            }
+            .about-intro-image {
+                height: 200px;
+            }
+            .timeline-content {
+                padding: 15px;
+            }
+            .timeline-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Page Transition Overlay -->
+    <div class="page-transition">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <!-- Theme Menu -->
+    <div class="theme-menu">
+        <h3 class="theme-menu-title">Choose a Theme</h3>
+        <div class="theme-options">
+            <div class="theme-option light-theme active" data-theme="light">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Light</div>
+            </div>
+            <div class="theme-option dark-theme" data-theme="dark">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Dark</div>
+            </div>
+            <div class="theme-option desert-theme" data-theme="desert">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Desert Sand</div>
+            </div>
+            <div class="theme-option hunter-theme" data-theme="hunter">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Hunter Green</div>
+            </div>
+            <div class="theme-option copper-theme" data-theme="copper">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Burnt Copper</div>
+            </div>
+            <div class="theme-option neon-theme" data-theme="neon">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Neon</div>
+            </div>
+            <div class="theme-option pastel-theme" data-theme="pastel">
+                <div class="theme-preview">
+                    <div class="theme-preview-left"></div>
+                    <div class="theme-preview-right"></div>
+                </div>
+                <div class="theme-name">Pastel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-box-open"></i>
+                <span>UniEssentials</span>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="about.html" class="active">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="faq.html">FAQ</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <button class="cart-icon" id="cart-icon" aria-label="Shopping cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button class="sign-in-btn" id="sign-in-btn" aria-label="Sign in">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-links">
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="faq.html">FAQ</a>
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <h1 class="animate__animated animate__fadeInDown">About Us</h1>
+            <div class="breadcrumb animate__animated animate__fadeInUp animate__delay-1s">
+                <a href="index.html">Home</a>
+                <span>/</span>
+                <span>About Us</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Intro Section -->
+    <section class="about-intro section" data-animated-bg="true">
+        <div class="container">
+            <div class="about-intro-content">
+                <div class="about-intro-text" data-aos="fade-right">
+                    <h2 class="section-title">We Help Students Thrive</h2>
+                    <p class="about-intro-description">
+                        UniEssentials was founded in 2019 by a group of recent university graduates who recognized the challenges that students face when transitioning to university life. We understand the stress of moving away from home, often for the first time, and the difficulties
+                        of managing studies, social life, and self-care.
+                    </p>
+                    <p class="about-intro-description">
+                        Our mission is to make university life easier, healthier, and more enjoyable by providing carefully curated care packages that address the unique needs of students. Whether it's nutritious snacks for late-night study sessions, personal care essentials
+                        for shared accommodations, or comfort items to make a dorm room feel like home, we've got students covered.
+                    </p>
+                    <p class="about-intro-description">
+                        What sets us apart is our first-hand understanding of student life. Our team has experienced the challenges of university and we design our products with those experiences in mind. We work closely with current students to ensure our packages remain relevant
+                        and valuable.
+                    </p>
+                </div>
+                <div class="about-intro-image" data-aos="fade-left"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Mission Section -->
+    <section class="our-mission section">
+        <div class="container">
+            <div class="mission-content">
+                <h2 class="mission-title" data-aos="zoom-in">Our Mission & Values</h2>
+                <p class="mission-description" data-aos="fade-up" data-aos-delay="100">
+                    At UniEssentials, our mission is to support students throughout their university journey by providing thoughtfully curated care packages that address their unique needs. We believe that when students have the essentials they need, they can focus on what
+                    truly matters: learning, growing, and making the most of their university experience.
+                </p>
+                <div class="mission-values">
+                    <!-- Value 1 -->
+                    <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="value-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="value-title">Student-Centered</h3>
+                        <p class="value-description">
+                            We put students at the heart of everything we do. Our products are designed by students, for students, ensuring they truly meet their needs.
+                        </p>
+                    </div>
+
+                    <!-- Value 2 -->
+                    <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="value-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3 class="value-title">Sustainability</h3>
+                        <p class="value-description">
+                            We are committed to reducing our environmental impact by using eco-friendly packaging and partnering with sustainable suppliers.
+                        </p>
+                    </div>
+
+                    <!-- Value 3 -->
+                    <div class="value-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="value-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 class="value-title">Community</h3>
+                        <p class="value-description">
+                            We believe in fostering a sense of community among students. Our packages include items that promote connection and well-being.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section section" data-animated-bg="true">
+        <div class="container">
+            <h2 class="team-title" data-aos="zoom-in">Meet Our Dream Team</h2>
+            <p class="team-subtitle" data-aos="fade-up">The brilliant minds making student life easier, one care package at a time</p>
+
+            <div class="team-grid">
+                <!-- Team Member 1 - Lonah -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+                    <div class="member-image" data-img="lonah.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Lonah Muregwi</h3>
+                        <p class="member-position">Visionary Founder</p>
+                        <p class="member-bio">
+                            The spark behind UniEssentials! Lonah came up with this from her dorm room after surviving on instant noodles for weeks. She believes every student deserves comfort while chasing their dreams.
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link" title="Email"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 - Paul -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="200">
+                    <div class="member-image" data-img="paul.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Paul Murombo</h3>
+                        <p class="member-position">Full Stack Wizard</p>
+                        <p class="member-bio">
+                            Our digital architect who makes magic happen between frontend and backend. Paul can debug code while asleep (we've tested this).
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" class="social-link" title="StackOverflow"><i class="fab fa-stack-overflow"></i></a>
+                            <a href="#" class="social-link" title="Coffee Chat"><i class="fas fa-mug-hot"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 - Paddington -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="300">
+                    <div class="member-image" data-img="paddington.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Paddington Gore</h3>
+                        <p class="member-position">Frontend Maestro</p>
+                        <p class="member-bio">
+                            Makes CSS bend to his will and JavaScript sing showtunes. Named after the bear but works faster than a honey-seeking missile.
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="Dribbble"><i class="fab fa-dribbble"></i></a>
+                            <a href="#" class="social-link" title="CodePen"><i class="fab fa-codepen"></i></a>
+                            <a href="#" class="social-link" title="Design Tips"><i class="fas fa-paint-brush"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 4 - Abby -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="400">
+                    <div class="member-image" data-img="abby.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Abigail Chitongo</h3>
+                        <p class="member-position">Quality Alchemist</p>
+                        <p class="member-bio">
+                            Turns ordinary items into student essentials gold. Abby can spot a quality pen from 20 paces and has a sixth sense for cozy blankets.
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="Pinterest"><i class="fab fa-pinterest"></i></a>
+                            <a href="#" class="social-link" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link" title="Wishlist"><i class="fas fa-heart"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 5 - Elic -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+                    <div class="member-image" data-img="elic.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Emmanuel Chinjekure</h3>
+                        <p class="member-position">Tech Futurist</p>
+                        <p class="member-bio">
+                            Our IoT whisperer who makes smart devices play nice together. Elic once automated his entire flat with a toaster and some spare parts.
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="Medium"><i class="fab fa-medium"></i></a>
+                            <a href="#" class="social-link" title="Tech Blog"><i class="fas fa-blog"></i></a>
+                            <a href="#" class="social-link" title="Demo Day"><i class="fas fa-robot"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 6 - Elma -->
+                <div class="team-member" data-aos="fade-up" data-aos-delay="200">
+                    <div class="member-image" data-img="elma.jpg"></div>
+                    <div class="member-details">
+                        <h3 class="member-name">Thelma Mashatise</h3>
+                        <p class="member-position">Data Sorceress</p>
+                        <p class="member-bio">
+                            Turns numbers into stories and spreadsheets into strategy. Elma knows what students need before they do (thanks to her predictive models).
+                        </p>
+                        <div class="member-social">
+                            <a href="#" class="social-link" title="Kaggle"><i class="fab fa-kaggle"></i></a>
+                            <a href="#" class="social-link" title="Data Viz"><i class="fas fa-chart-line"></i></a>
+                            <a href="#" class="social-link" title="Research"><i class="fas fa-microscope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set your base image path
+            const baseImagePath = 'images/';
+
+            // Get all member images
+            const members = document.querySelectorAll('.member-image');
+
+            // Array of image filenames in order (matches your team members)
+            const teamImages = [
+                'lonah.jpg',
+                'paul.jpg',
+                'paddington.jpg',
+                'abby.jpg',
+                'elic.jpg',
+                'elma.jpg'
+            ];
+
+            // Apply images to each member
+            members.forEach((member, index) => {
+                if (index < teamImages.length) {
+                    const imgPath = baseImagePath + teamImages[index];
+                    member.style.backgroundImage = `url('${imgPath}')`;
+                    member.style.backgroundSize = 'cover';
+                    member.style.backgroundPosition = 'center';
+                }
+            });
+        });
+    </script>
+    <!-- Timeline Section -->
+    <section class="timeline-section section">
+        <div class="container">
+            <h2 class="timeline-title" data-aos="zoom-in">Our Journey</h2>
+            <div class="timeline">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item" data-aos="fade-up">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2019</span>
+                        <div class="timeline-dot"></div>
+                        <h3 class="timeline-title">The Beginning</h3>
+                        <p class="timeline-description">
+                            UniEssentials was founded by Lonah Muregwi after her own challenging first year at university. The first care packages were assembled in her university dorm room.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2020</span>
+                        <div class="timeline-dot"></div>
+                        <h3 class="timeline-title">Expansion & Growth</h3>
+                        <p class="timeline-description">
+                            We moved to our first warehouse and expanded our team to meet growing demand. We introduced our popular Exam Season Bundle during this year.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2021</span>
+                        <div class="timeline-dot"></div>
+                        <h3 class="timeline-title">Sustainability Focus</h3>
+                        <p class="timeline-description">
+                            We committed to making our operations more sustainable by switching to eco-friendly packaging and partnering with local suppliers.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 4 -->
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2022</span>
+                        <div class="timeline-dot"></div>
+                        <h3 class="timeline-title">New Product Lines</h3>
+                        <p class="timeline-description">
+                            We launched our Wellness Collection, focusing on mental health and self-care products for students, which quickly became one of our bestsellers.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 5 -->
+                <div class="timeline-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2023</span>
+                        <div class="timeline-dot"></div>
+                        <h3 class="timeline-title">Today & Beyond</h3>
+                        <p class="timeline-description">
+                            We continue to grow and innovate, with plans to expand our product range and reach more universities across Harare Province and eventually Zimbabwe.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials section">
+        <div class="container">
+            <h2 class="section-title" data-aos="zoom-in">What Students Say</h2>
+            <div class="testimonial-slider" data-aos="fade-up">
+                <div class="testimonial-slides">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-content">"The Exam Season Bundle was a lifesaver during my finals. The snacks kept me going, and the stress relief items helped me stay calm. Highly recommend! plus panodawo ka more toiletries lol"</p>
+                            <h4 class="testimonial-author">Mr Manyoka</h4>
+                            <p class="testimonial-position">IT Student, The Streets</p>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="testimonial-content">"As a first-year student, the Fresher's Welcome Pack made settling into university so much easier. It had everything I needed and saved me multiple trips to the shops."</p>
+                            <h4 class="testimonial-author">James Chimuti</h4>
+                            <p class="testimonial-position">Computer Science Student, Harare Intstitute of Technology</p>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar"></div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-content">"The quality of products in my Dorm Room Comfort Pack was excellent. The delivery was quick, and the customer service was responsive when I had questions."</p>
+                            <h4 class="testimonial-author">Emma Chido</h4>
+                            <p class="testimonial-position">Psychology Student, HIT University</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial Controls -->
+                <div class="testimonial-controls">
+                    <div class="testimonial-control prev-testimonial">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="testimonial-control next-testimonial">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <!-- Testimonial Indicators -->
+                <div class="testimonial-indicators">
+                    <div class="testimonial-indicator active" data-index="0"></div>
+                    <div class="testimonial-indicator" data-index="1"></div>
+                    <div class="testimonial-indicator" data-index="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section section">
+        <div class="cta-background"></div>
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title" data-aos="fade-up">Join Our Mission</h2>
+                <p class="cta-text" data-aos="fade-up" data-aos-delay="100">Help us make university life better for students across Zimbabwe. Shop our products, join our team, or partner with us.</p>
+                <div class="cta-buttons" data-aos="fade-up" data-aos-delay="200">
+                    <a href="products.html" class="cta-primary-btn">
+                        <i class="fas fa-shopping-bag"></i> Shop Now
+                    </a>
+                    <a href="contact.html" class="cta-secondary-btn">
+                        <i class="fas fa-envelope"></i> Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="index.html">Home</a>
+                        <a href="products.html">Products</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="faq.html">FAQ</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Categories</h3>
+                    <div class="footer-links">
+                        <a href="products.html#snacks">Snack Packs</a>
+                        <a href="products.html#personal-care">Personal Care</a>
+                        <a href="products.html#stationery">Stationery</a>
+                        <a href="products.html#comfort">Comfort Items</a>
+                        <a href="products.html#wellness">Wellness Products</a>
+                    </div>
+                </div>
+                <div class="footer-column" data-aos="fade-up" data-aos-delay="300">
+                    <h3>Help & Support</h3>
+                    <div class="footer-links">
+                        <a href="#">Shipping Information</a>
+                        <a href="#">Returns Policy</a>
+                        <a href="faq.html">FAQ</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-column footer-newsletter" data-aos="fade-up" data-aos-delay="400">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter for special offers, new products, and student life tips.</p>
+                    <form class="footer-newsletter-form">
+                        <input type="email" class="footer-newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="footer-newsletter-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 UniEssentials. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cookie Policy Popup -->
+    <div class="cookie-popup" id="cookie-popup">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <h3>Cookie Policy</h3>
+                <p>We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. By clicking "Accept", you consent to our use of cookies as described in our Cookie Policy.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn accept-cookies" id="accept-cookies">Accept</button>
+                <button class="cookie-btn decline-cookies" id="decline-cookies">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="animations.js"></script>
+    <script src="theme-fix.js"></script>
+    <script src="products-db.js"></script>
+    <script src="cart.js"></script>
+    <script src="fix-loading.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: false,
+                mirror: false
+            });
+
+            // Initialize variables
+            let currentTestimonialIndex = 0;
+
+            // DOM Elements
+            const testimonialSlides = document.querySelector('.testimonial-slides');
+            const testimonialIndicators = document.querySelectorAll('.testimonial-indicator');
+            const prevTestimonialBtn = document.querySelector('.prev-testimonial');
+            const nextTestimonialBtn = document.querySelector('.next-testimonial');
+
+            // Testimonial slider functionality
+            function updateTestimonialSlider() {
+                testimonialSlides.style.transform = `translateX(-${currentTestimonialIndex * 100}%)`;
+
+                testimonialIndicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === currentTestimonialIndex);
+                });
+            }
+
+            if (prevTestimonialBtn) {
+                prevTestimonialBtn.addEventListener('click', () => {
+                    currentTestimonialIndex = (currentTestimonialIndex - 1 + 3) % 3;
+                    updateTestimonialSlider();
+                });
+            }
+
+            if (nextTestimonialBtn) {
+                nextTestimonialBtn.addEventListener('click', () => {
+                    currentTestimonialIndex = (currentTestimonialIndex + 1) % 3;
+                    updateTestimonialSlider();
+                });
+            }
+
+            if (testimonialIndicators.length > 0) {
+                testimonialIndicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        currentTestimonialIndex = index;
+                        updateTestimonialSlider();
+                    });
+                });
+
+                // Auto rotate testimonials
+                setInterval(() => {
+                    currentTestimonialIndex = (currentTestimonialIndex + 1) % 3;
+                    updateTestimonialSlider();
+                }, 5000);
+            }
+
+            // Newsletter subscription
+            const footerNewsletterForm = document.querySelector('.footer-newsletter-form');
+            if (footerNewsletterForm) {
+                footerNewsletterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = footerNewsletterForm.querySelector('.footer-newsletter-input').value;
+                    showNotification('Subscription Successful', `Thank you for subscribing to our newsletter with ${email}.`);
+                    footerNewsletterForm.reset();
+                });
+            }
+
+            // Set background images
+            const aboutIntroImage = document.querySelector('.about-intro-image');
+            if (aboutIntroImage) {
+                aboutIntroImage.style.backgroundImage = `url('images/pic1.jpg')`;
+            }
+
+            // Set team member images
+
+
+            // Set testimonial avatars
+            const avatars = document.querySelectorAll('.testimonial-avatar');
+
+            if (avatars.length >= 3) {
+                avatars[0].style.backgroundImage = "url('assets/img/testimonials/sarah.jpg')";
+                avatars[1].style.backgroundImage = "url('assets/img/testimonials/james.jpg')";
+                avatars[2].style.backgroundImage = "url('assets/img/testimonials/emma.jpg')";
+            }
+        });
+    </script>
