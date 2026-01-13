@@ -216,489 +216,642 @@ if (!$logs_query) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="responsive.css">
     <title>Admin - <?php echo $page_title; ?></title>
     <style>
+        /* Color Palette from schome.php */
         :root {
-            --primary: #4e73df;
-            --success: #1cc88a;
-            --info: #36b9cc;
-            --warning: #f6c23e;
-            --danger: #e74a3b;
-            --secondary: #858796;
-            --light: #f8f9fc;
-            --dark: #5a5c69;
+            --primary-dark: #4b648d;
+            --primary-light: #e7fbf9;
+            --accent-teal: #41737c;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
         }
-        
-        html, body {
-            height: 100%;
+
+        * {
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
-        
+
+        body {
+            background: linear-gradient(-45deg, #4b648d, #41737c, #4b648d, #41737c);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Particle Background */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+            animation: float 25s infinite linear;
+            backdrop-filter: blur(2px);
+        }
+
+        .particle:nth-child(odd) {
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .particle:nth-child(even) {
+            animation-duration: 35s;
+            animation-delay: -10s;
+        }
+
+        .particle:nth-child(3n) {
+            background: linear-gradient(45deg, rgba(231, 251, 249, 0.9), rgba(65, 115, 124, 0.6));
+            box-shadow: 0 0 30px rgba(65, 115, 124, 0.7);
+        }
+
+        .particle:nth-child(4n) {
+            background: linear-gradient(45deg, rgba(75, 100, 141, 0.8), rgba(255, 255, 255, 0.4));
+            box-shadow: 0 0 35px rgba(75, 100, 141, 0.5);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(0.3);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.9;
+                transform: translateY(90vh) rotate(36deg) scale(1.2);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(50vh) rotate(180deg) scale(1.5);
+            }
+            90% {
+                opacity: 0.9;
+                transform: translateY(10vh) rotate(324deg) scale(1.2);
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main Container */
         .admin-container {
             display: flex;
             min-height: 100vh;
             position: relative;
+            z-index: 2;
         }
-        
+
+        /* Sidebar */
         .sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
-            color: white;
-            min-height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-teal));
+            color: var(--text-light);
             position: fixed;
             top: 0;
             left: 0;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-        
-        .sidebar-brand {
-            height: 70px;
+            height: 100%;
+            z-index: 100;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 800;
-            padding: 1.5rem 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            flex-direction: column;
+            box-shadow: 4px 0 15px var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-brand .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
         .sidebar-menu {
-            padding: 0;
+            padding: 2rem 0;
             list-style: none;
+            flex: 1;
         }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
+
+        .sidebar-menu li a {
             display: block;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
         }
-        
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-light);
+            transform: translateX(5px);
         }
-        
+
         .sidebar-menu i {
             margin-right: 0.5rem;
             width: 20px;
             text-align: center;
         }
-        
+
+        /* Content Wrapper */
         .content-wrapper {
-            flex: 1;
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 280px;
+            width: calc(100% - 280px);
             min-height: 100vh;
-            overflow-y: auto;
-            position: relative;
         }
-        
+
+        /* Topbar */
         .topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px var(--shadow);
             height: 70px;
-            background-color: white;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
-            margin-bottom: 1.5rem;
+            align-items: center;
+            padding: 0 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
-        
+
         .topbar h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--dark);
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 600;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
+            gap: 1rem;
         }
-        
+
         .user-info span {
-            margin-right: 1rem;
-            color: var(--dark);
+            color: var(--text-dark);
+            font-weight: 500;
         }
-        
+
         .logout-btn {
-            background-color: var(--danger);
-            color: white;
+            background: linear-gradient(135deg, var(--accent-teal), var(--primary-dark));
+            color: var(--text-light);
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
-        
+
         .logout-btn:hover {
-            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(65, 115, 124, 0.3);
         }
-        
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-            background-color: white;
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
             padding: 1rem;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            overflow-x: auto;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
+        .tab-navigation a {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            margin-right: 0.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-navigation a:hover,
+        .tab-navigation a.active {
+            background: var(--accent-teal);
+            color: var(--text-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(65, 115, 124, 0.3);
+        }
+
+        .tab-navigation a i {
+            margin-right: 0.5rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         .filter-group {
             display: flex;
-            align-items: flex-start;
             flex-wrap: wrap;
-            width: 100%;
+            gap: 1rem;
+            align-items: center;
         }
-        
-        .filter-group form {
-            display: flex;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-        
+
         .filter-group label {
-            margin-right: 0.5rem;
             font-weight: 600;
-            margin-top: 0.5rem;
-            min-width: 60px;
+            color: var(--text-dark);
+            margin-right: 0.5rem;
         }
-        
-        .filter-group select, .filter-group input {
-            padding: 0.5rem;
-            border: 1px solid #d1d3e2;
-            border-radius: 0.35rem;
-            margin-right: 1rem;
-            margin-bottom: 0.5rem;
-            max-width: 200px;
+
+        .filter-group .form-control {
+            padding: 0.8rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            min-width: 150px;
         }
-        
-        .filter-btn {
-            background-color: var(--primary);
-            color: white;
+
+        .filter-group .form-control:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(65, 115, 124, 0.1);
+        }
+
+        .filter-group button {
+            background: linear-gradient(135deg, var(--accent-teal), var(--primary-dark));
+            color: var(--text-light);
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
         }
-        
-        .filter-btn:hover {
-            background-color: #2e59d9;
+
+        .filter-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(65, 115, 124, 0.3);
         }
-        
-        .reset-btn {
-            background-color: var(--secondary);
+
+        /* Export Button Styles (matching asset button style) */
+        .export-btn-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
-            border: none;
-            padding: 0.5rem 1rem
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-left: 0.5rem;
+            padding: 14px 28px;
+            border-radius: 8px;
             text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .reset-btn:hover {
-            background-color: #6e707e;
+
+        .export-btn-inline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
-        
-        table {
+
+        .export-btn-inline:hover::before {
+            left: 100%;
+        }
+
+        .export-btn-inline:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            background: linear-gradient(135deg, #0056b3, #004085);
+        }
+
+        .export-btn-inline:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .export-btn-inline.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .export-btn-inline.loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            margin-left: 8px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
-            background-color: white;
-            border-radius: 0.35rem;
-            overflow: hidden;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         }
-        
-        table th, table td {
+
+        .table th {
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-teal));
+            color: var(--text-light);
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #e3e6f0;
-            word-break: break-word;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        table th {
-            background-color: #f8f9fc;
-            color: var(--dark);
-            font-weight: 700;
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--text-dark);
         }
-        
-        table tr:last-child td {
+
+        .table tbody tr:hover {
+            background: rgba(65, 115, 124, 0.05);
+        }
+
+        .table tbody tr:last-child td {
             border-bottom: none;
         }
-        
-        .action-tag {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: capitalize;
         }
-        
-        .action-tag.login {
-            background-color: #e3fcef;
-            color: #1cc88a;
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
         }
-        
-        .action-tag.logout {
-            background-color: #eaecf4;
-            color: #858796;
+
+        .status-warning {
+            background: #fff3e0;
+            color: #e65100;
         }
-        
-        .action-tag.create {
-            background-color: #d1ecf1;
-            color: #36b9cc;
+
+        .status-danger {
+            background: #ffebee;
+            color: #c62828;
         }
-        
-        .action-tag.update {
-            background-color: #fff3cd;
-            color: #f6c23e;
+
+        .status-info {
+            background: #e3f2fd;
+            color: #1565c0;
         }
-        
-        .action-tag.delete {
-            background-color: #f8d7da;
-            color: #e74a3b;
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border: 1px solid;
         }
-        
-        .action-tag.asset_status_change {
-            background-color: #d1ecf1;
-            color: #36b9cc;
+
+        .alert-danger {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: #f44336;
+            color: #c62828;
         }
-        
-        .action-tag.asset_deleted {
-            background-color: #f8d7da;
-            color: #e74a3b;
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4caf50;
+            color: #2e7d32;
         }
-        
-        /* Status tags for scan logs */
-        .status-tag {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            text-transform: capitalize;
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-color: #ff9800;
+            color: #e65100;
         }
-        
-        .status-tag.success {
-            background-color: #e3fcef;
-            color: #1cc88a;
-        }
-        
-        .status-tag.warning {
-            background-color: #fff3cd;
-            color: #f6c23e;
-        }
-        
-        .status-tag.alert {
-            background-color: #f8d7da;
-            color: #e74a3b;
-        }
-        
-        .status-tag.info {
-            background-color: #d1ecf1;
-            color: #36b9cc;
-        }
-        
+
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            margin-top: 1.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
         }
-        
-        .pagination a, .pagination span {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            margin: 0 0.25rem;
-            border-radius: 0.25rem;
+
+        .pagination a,
+        .pagination span {
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-dark);
             text-decoration: none;
-            color: var(--primary);
-            background-color: white;
-            border: 1px solid #dddfeb;
-            transition: all 0.3s;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
         }
-        
-        .pagination a:hover {
-            background-color: #eaecf4;
-            border-color: #dddfeb;
+
+        .pagination a:hover,
+        .pagination .current {
+            background: var(--accent-teal);
+            color: var(--text-light);
         }
-        
-        .pagination a.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-row {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .pagination .disabled {
-            color: #b7b9cc;
-            pointer-events: none;
-            cursor: default;
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .content-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .sidebar.active {
+                width: 280px;
+            }
+
+            .topbar h1 {
+                font-size: 1.4rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group .form-control {
+                min-width: auto;
+            }
         }
-        
-        .message {
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0.35rem;
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .sidebar {
+            animation: slideInLeft 0.8s ease-out;
         }
-        
-        .card {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            word-wrap: break-word;
-            background-color: #fff;
-            background-clip: border-box;
-            border: 1px solid #e3e6f0;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 1.5rem;
+
+        .topbar {
+            animation: fadeIn 0.6s ease-out 0.2s both;
         }
-        
-        .card-header {
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 0;
-            background-color: #f8f9fc;
-            border-bottom: 1px solid #e3e6f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card-header h2, .card-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .card-body {
-            flex: 1 1 auto;
-            overflow-x: auto;
-            padding: 1.25rem;
-        }
-        
-        .export-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-        }
-        
-        .export-btn i {
-            margin-right: 0.5rem;
-        }
-        
-        .export-btn:hover {
-            background-color: #17a673;
-            color: white;
-        }
-        
-        .tab-navigation {
-            display: flex;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e3e6f0;
-        }
-        
-        .tab-navigation a {
-            padding: 0.75rem 1.5rem;
-            text-decoration: none;
-            color: var(--secondary);
-            font-weight: 600;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab-navigation a:hover {
-            color: var(--primary);
-        }
-        
-        .tab-navigation a.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-        }
-        
-        .alert {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.35rem;
-        }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .main-content {
+            animation: fadeIn 0.8s ease-out 0.4s both;
         }
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-shield-alt"></i> Admin Portal
-            </div>
-            <ul class="sidebar-menu">
-                <li><a href="admin_dashboard.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_dashboard.php') ? 'class="active"' : ''; ?>><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="admin_assets.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_assets.php') ? 'class="active"' : ''; ?>><i class="fas fa-laptop"></i> Assets</a></li>
-                <li><a href="admin_users.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_users.php') ? 'class="active"' : ''; ?>><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="scpersonnel.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'scpersonnel.php') ? 'class="active"' : ''; ?>><i class="fas fa-user-shield"></i> Security Personnel</a></li>
-                <li><a href="admin_logs.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_logs.php') ? 'class="active"' : ''; ?>><i class="fas fa-history"></i> System Logs</a></li>
-                <li><a href="admin_settings.php" <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_settings.php') ? 'class="active"' : ''; ?>><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="admin_logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            </ul>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="content-wrapper">
-            <!-- Top Bar -->
-            <div class="topbar">
-                <h1><?php echo $page_title; ?></h1>
-                <div class="user-info">
-                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
-                    <a href="admin_logout.php" class="logout-btn">Logout</a>
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="title">Admin Portal</div>
                 </div>
             </div>
+            <ul class="sidebar-menu">
+                <li><a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="admin_assets.php"><i class="fas fa-laptop"></i> Assets</a></li>
+                <li><a href="admin_users.php"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="admin_security_approvals.php"><i class="fas fa-user-shield"></i> Security Personnel</a></li>
+                <li><a href="admin_logs.php" class="active"><i class="fas fa-history"></i> System Logs</a></li>
+                <li><a href="admin_settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="welcome.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><?php echo $page_title; ?></h1>
+                </div>
+                <div class="user-info">
+                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
+                    <i class="fas fa-user-shield" style="font-size: 24px;"></i>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
             
             <!-- Tab Navigation -->
             <div class="tab-navigation">
@@ -754,42 +907,49 @@ if (!$logs_query) {
                     </div>
                 </div>
                 
+                <!-- Export Button -->
+                <div style="margin-top: 15px;">
+                    <a href="export_logs.php?type=admin" class="export-btn-inline">
+                        <i class="fas fa-file-export"></i> Export CSV
+                    </a>
+                </div>
+                
                 <!-- Admin Logs Table -->
                 <div class="card">
                     <div class="card-header">
                         <h3>Admin Activity Logs</h3>
-                        <a href="export_logs.php?type=admin" class="export-btn"><i class="fas fa-file-export"></i> Export CSV</a>
                     </div>
                     <div class="card-body">
                         <?php if ($logs_query && mysqli_num_rows($logs_query) > 0): ?>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Admin</th>
-                                        <th>Action</th>
-                                        <th>Description</th>
-                                        <th>IP Address</th>
-                                        <th>Timestamp</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Admin</th>
+                                            <th>Action</th>
+                                            <th>Description</th>
+                                            <th>IP Address</th>
+                                            <th>Timestamp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     <?php while ($log = mysqli_fetch_assoc($logs_query)): ?>
                                         <tr>
                                             <td><?php echo $log['admin_id'] ? htmlspecialchars($log['admin_id']) : 'System'; ?></td>
                                             <td><?php echo htmlspecialchars($log['admin_username'] ?? 'Unknown'); ?></td>
                                             <td>
-                                                <span class="action-tag 
+                                                <span class="status-badge 
                                                     <?php 
-                                                        if (strpos($log['action'], 'asset_') === 0) echo 'asset_status_change';
-                                                        elseif (strpos($log['action'], 'user_') === 0) echo 'create';
-                                                        elseif (strpos($log['action'], 'security_') === 0) echo 'update';
-                                                        elseif ($log['action'] == 'login') echo 'login';
-                                                        elseif ($log['action'] == 'logout') echo 'logout';
-                                                        elseif ($log['action'] == 'create') echo 'create';
-                                                        elseif ($log['action'] == 'update') echo 'update';
-                                                        elseif ($log['action'] == 'delete') echo 'delete';
-                                                        else echo 'info';
+                                                        if (strpos($log['action'], 'asset_') === 0) echo 'status-info';
+                                                        elseif (strpos($log['action'], 'user_') === 0) echo 'status-success';
+                                                        elseif (strpos($log['action'], 'security_') === 0) echo 'status-warning';
+                                                        elseif ($log['action'] == 'login') echo 'status-success';
+                                                        elseif ($log['action'] == 'logout') echo 'status-info';
+                                                        elseif ($log['action'] == 'create') echo 'status-success';
+                                                        elseif ($log['action'] == 'update') echo 'status-warning';
+                                                        elseif ($log['action'] == 'delete') echo 'status-danger';
+                                                        else echo 'status-info';
                                                     ?>">
                                                     <?php echo htmlspecialchars($log['action']); ?>
                                                 </span>
@@ -801,6 +961,7 @@ if (!$logs_query) {
                                     <?php endwhile; ?>
                                 </tbody>
                             </table>
+                            </div>
                         <?php else: ?>
                             <p>No admin logs found.</p>
                         <?php endif; ?>
@@ -861,20 +1022,27 @@ if (!$logs_query) {
                     </div>
                 </div>
                 
+                <!-- Export Button -->
+                <div style="margin-top: 15px;">
+                    <a href="export_logs.php?type=scan" class="export-btn-inline">
+                        <i class="fas fa-file-export"></i> Export CSV
+                    </a>
+                </div>
+                
                 <!-- Scan Logs Table -->
                 <div class="card">
                     <div class="card-header">
                         <h3>RFID Scan Logs</h3>
-                        <a href="export_logs.php?type=scan" class="export-btn"><i class="fas fa-file-export"></i> Export CSV</a>
                     </div>
                     <div class="card-body">
                         <?php if ($logs_query && mysqli_num_rows($logs_query) > 0): ?>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>RFID UID</th>
-                                        <th>Asset</th>
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>RFID UID</th>
+                                            <th>Asset</th>
                                         <th>Scanner ID</th>
                                         <th>Location</th>
                                         <th>Status</th>
@@ -900,7 +1068,7 @@ if (!$logs_query) {
                                                     <?php endif; ?>
                                                     <?php if (isset($log['rfid_status'])): ?>
                                                         <br>
-                                                        <small>Status: <span class="status-tag <?php echo strtolower(htmlspecialchars($log['rfid_status'])); ?>">
+                                                        <small>Status: <span class="status-badge status-<?php echo strtolower(htmlspecialchars($log['rfid_status'])); ?>">
                                                             <?php echo htmlspecialchars($log['rfid_status']); ?>
                                                         </span></small>
                                                     <?php endif; ?>
@@ -911,7 +1079,7 @@ if (!$logs_query) {
                                             <td><?php echo htmlspecialchars($log['scanner_id']); ?></td>
                                             <td><?php echo htmlspecialchars($log['location'] ?? 'Unknown'); ?></td>
                                             <td>
-                                                <span class="status-tag <?php echo htmlspecialchars($log['status']); ?>">
+                                                <span class="status-badge status-<?php echo htmlspecialchars($log['status']); ?>">
                                                     <?php echo htmlspecialchars($log['status']); ?>
                                                 </span>
                                             </td>
@@ -920,6 +1088,7 @@ if (!$logs_query) {
                                     <?php endwhile; ?>
                                 </tbody>
                             </table>
+                            </div>
                         <?php else: ?>
                             <p>No scan logs found.</p>
                         <?php endif; ?>
@@ -947,7 +1116,21 @@ if (!$logs_query) {
         </div>
     </div>
 
+    <script src="js/particles.js"></script>
+    <script src="js/home.js"></script>
     <script>
+        // Initialize particles
+        document.addEventListener('DOMContentLoaded', function() {
+            const particlesContainer = document.querySelector('.particles-container');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 25 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        });
+
         // Add event listener to reset button
         document.addEventListener('DOMContentLoaded', function() {
             const resetButtons = document.querySelectorAll('.reset-btn');
@@ -956,6 +1139,34 @@ if (!$logs_query) {
                     e.preventDefault();
                     const logType = new URLSearchParams(window.location.search).get('log_type') || 'admin';
                     window.location.href = `?log_type=${logType}`;
+                });
+            });
+        });
+
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
+
+        // Export button loading state
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportButtons = document.querySelectorAll('.export-btn-inline');
+            exportButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.add('loading');
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+
+                    // Remove loading state after 2 seconds (in case download doesn't start immediately)
+                    setTimeout(() => {
+                        this.classList.remove('loading');
+                        this.innerHTML = '<i class="fas fa-file-export"></i> Export CSV';
+                    }, 2000);
                 });
             });
         });

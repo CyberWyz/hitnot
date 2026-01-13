@@ -10,6 +10,13 @@ include("php/config.php");
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Get officer name for sidebar
+$id = $_SESSION['id'];
+$query = mysqli_query($con, "SELECT * FROM scpersonnel WHERE id=$id");
+while ($result = mysqli_fetch_assoc($query)) {
+    $res_name = $result['name'];
+}
+
 $message = "";
 $owner_verified = false;
 $data_file = "rfid_data.txt"; // File where Arduino/Python writes the RFID data
@@ -300,101 +307,601 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Assets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
-    <link rel="stylesheet" href="style/verifyassets.css">
-   <!-- <link rel="stylesheet" href="style/style.css">-->
-   <style>
-/* Sidebar styles */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 220px;
-    height: 100vh;
-    background: #23272e;
-    color: #fff;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-}
-.sidebar-brand {
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 24px 20px 16px 20px;
-    background: #1a1d22;
-    text-align: center;
-    letter-spacing: 1px;
-    border-bottom: 1px solid #2c313a;
-}
-.sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex: 1;
-}
-.sidebar-menu li {
-    width: 100%;
-}
-.sidebar-menu li a {
-    display: block;
-    padding: 14px 24px;
-    color: #b8c7ce;
-    text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-    font-size: 1em;
-    border-left: 4px solid transparent;
-}
-.sidebar-menu li a.active,
-.sidebar-menu li a:hover {
-    background: #2c313a;
-    color: #fff;
-    font-weight: bold;
-    border-left: 4px solid #4fc3f7;
-}
-.container {
-    margin-left: 220px;
-    padding: 32px 24px 24px 24px;
-    min-height: 100vh;
-    background: #f4f6f9;
-    box-sizing: border-box;
-}
-@media (max-width: 800px) {
-    .sidebar {
-        width: 60px;
-    }
-    .sidebar-brand {
-        font-size: 0.9em;
-        padding: 16px 8px;
-    }
-    .sidebar-menu li a {
-        padding: 12px 10px;
-        font-size: 0.95em;
-        text-align: center;
-    }
-    .container {
-        margin-left: 60px;
-        padding: 16px 8px 8px 8px;
-    }
-}
-</style>
+    <style>
+
+        .container {
+            margin-top: 20px;
+            padding: 32px 24px 24px 24px;
+            min-height: calc(100vh - 90px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px var(--shadow);
+            box-sizing: border-box;
+        }
+
+        /* RFID Section Styles */
+
+        .rfid-verification {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .rfid-verification h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+
+        #rfid-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        #rfid-form .field {
+            flex: 1;
+        }
+
+        #manual-rfid-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .rfid-details {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .rfid-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-tampered {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-lost {
+            background: #fff3cd;
+            color: #856404;
+        }
+        /* Owner Verification Section */
+
+        .owner-verification {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .owner-verification h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        /* Container and Layout */
+
+        .box.form-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .left-section,
+        .right-section {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        /* Photo and Details */
+
+        .photo-container img {
+            max-width: 200px;
+            max-height: 200px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        /* Messages */
+
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        /* Scanner Sections */
+
+        .scanner-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        /* Buttons */
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #0069d9;
+        }
+        /* Debug Info */
+
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        /* Officer Info Bar */
+        .officer-info-bar {
+            background: #343a40;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .officer-info-bar .officer-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .officer-info-bar .officer-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .officer-info-bar .officer-id {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .officer-info-bar .scan-count {
+            background: #007bff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 0;
+            width: 70%;
+            max-width: 700px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            animation: modalopen 0.5s;
+        }
+
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-60px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .emergency-modal .modal-content {
+            background-color: #fff;
+            border: 3px solid #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .emergency-modal .modal-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .emergency-modal h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .emergency-modal .modal-body {
+            padding: 20px;
+        }
+
+        .emergency-modal .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            text-align: right;
+        }
+
+        .emergency-message {
+            font-size: 1.1rem;
+        }
+
+        .emergency-message p {
+            margin-bottom: 15px;
+        }
+
+        .emergency-message strong {
+            color: #dc3545;
+            font-size: 1.2em;
+        }
+
+        .action-instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .action-instructions h3 {
+            margin-top: 0;
+            color: #dc3545;
+        }
+
+        .action-instructions ol {
+            padding-left: 20px;
+        }
+
+        .action-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .missing-detail {
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+        }
+
+        .missing-detail strong {
+            color: #721c24;
+        }
+
+        .close-modal {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #f8f9fa;
+        }
+
+        .status-missing {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-blacklisted {
+            background: #343a40;
+            color: white;
+        }
+
+        .status-recovered {
+            background: #28a745;
+            color: white;
+        }
+
+        /* Sidebar and Layout Styles from schome.php */
+        :root {
+            --primary-dark: #4b648d;
+            --primary-light: #e7fbf9;
+            --accent-teal: #41737c;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #4b648d, #41737c, #4b648d, #41737c);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-teal));
+            color: var(--text-light);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-brand .reg-number {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            padding: 2rem 0;
+            list-style: none;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px var(--shadow);
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topbar h1 {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info span {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .user-info img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-teal);
+            object-fit: cover;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            margin-right: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            .content-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar.active {
+                width: 280px;
+            }
+            .toggle-sidebar {
+                display: block !important;
+            }
+            .topbar {
+                padding: 0 1rem;
+            }
+            .topbar h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <span>Smart Tag Asset Management System</span>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-user-circle" style="font-size: 50px; color: white;"></i>
+                    <div class="reg-number"><?php echo htmlspecialchars($res_name); ?></div>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="schome.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="missingassets.php">
+                        <i class="fas fa-search"></i> Missing Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="regAsset.php">
+                        <i class="fas fa-plus-circle"></i> Register Asset
+                    </a>
+                </li>
+                <li>
+                    <a href="blacklistedassets.php">
+                        <i class="fas fa-ban"></i> Blacklisted Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="verifyassets.php" class="active">
+                        <i class="fas fa-check-circle"></i> Verify Asset
+                    </a>
+                </li>
+                <li>
+                    <a href="welcome.php">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </li>
+            </ul>
         </div>
-        <ul class="sidebar-menu">
-            <li><a href="schome.php">Dashboard</a></li>
-            <li><a href="missingassets.php">Missing Assets</a></li>
-            <li><a href="regAsset.php">Register New Asset</a></li>
-            <li><a href="blacklistedassets.php">Blacklisted Assets</a></li>
-            <li><a href="verifyassets.php" class="active">Verify Asset</a></li>
-            <li><a href="php/logout.php">Logout</a></li>
-        </ul>
-    </div>
-    <div class="container">
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Verify Assets</h1>
+                </div>
+                <div class="user-info">
+                    <span>Welcome, <b><?php echo htmlspecialchars($res_name); ?></b></span>
+                    <i class="fas fa-user-circle" style="font-size: 24px;"></i>
+                </div>
+            </div>
+
+            <div class="container">
         <!-- Officer Info Bar -->
         <?php if (isset($_SESSION['officer_details']) && !empty($_SESSION['officer_details'])): ?>
         <div class="officer-info-bar">
@@ -403,7 +910,7 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                 <div class="officer-id">ID: <?php echo htmlspecialchars($_SESSION['officer_details']['officer_id']); ?></div>
             </div>
             <div class="scan-count">
-                <?php 
+                <?php
                     // Get scan count for today
                     $officer_id = mysqli_real_escape_string($con, $_SESSION['officer_details']['officer_id']);
                     $scan_count_query = "SELECT COUNT(*) as count FROM scan_logs WHERE scanner_id = '$officer_id' AND DATE(scan_time) = CURDATE()";
@@ -417,7 +924,7 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
             </div>
         </div>
         <?php endif; ?>
-        
+
         <div class="box form-box">
             <header>Verify Assets</header>
 
@@ -477,8 +984,8 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                         </span>
                     </p>
                     <p><strong>Last Scanned:</strong>
-                        <?php echo !empty($_SESSION['asset_details']['last_scanned']) ? 
-                            date('Y-m-d H:i', strtotime($_SESSION['asset_details']['last_scanned'])) : 
+                        <?php echo !empty($_SESSION['asset_details']['last_scanned']) ?
+                            date('Y-m-d H:i', strtotime($_SESSION['asset_details']['last_scanned'])) :
                             'Never'; ?>
                     </p>
                 </div>
@@ -491,11 +998,11 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                 <h3>Ownership Verification</h3>
                 <?php if ($owner_verified): ?>
                 <div class="message success">
-                    <p>✅ Verified Owner: This asset is registered to the scanned student.</p>
+                    <p>✅ Verified Owner: This asset belongs to the scanned student.</p>
                 </div>
                 <?php else: ?>
                 <div class="message error">
-                    <p>❌ Ownership Mismatch: This asset is NOT registered to the scanned student!</p>
+                    <p>❌ Ownership Mismatch: This asset does NOT belong to the scanned student!</p>
                     <p>Asset Owner:
                         <?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?>
                     </p>
@@ -519,69 +1026,41 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                             <img src="<?php echo htmlspecialchars($_SESSION['asset_details']['picture']); ?>" alt="Asset Picture">
                         </div>
                         <?php endif; ?>
-                        <p><strong>Serial Number:</strong>
-                            <?php echo htmlspecialchars($_SESSION['asset_details']['serial_number']); ?>
-                        </p>
-                        <p><strong>Model:</strong>
-                            <?php echo htmlspecialchars($_SESSION['asset_details']['item_model']); ?>
-                        </p>
-                        <p><strong>Date Registered:</strong>
-                            <?php echo htmlspecialchars($_SESSION['asset_details']['date_registered']); ?>
-                        </p>
-                        <p><strong>Owner:</strong>
-                            <?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?>
-                        </p>
+                        <p><strong>Serial Number:</strong> <?php echo htmlspecialchars($_SESSION['asset_details']['serial_number']); ?></p>
+                        <p><strong>Model:</strong> <?php echo htmlspecialchars($_SESSION['asset_details']['item_model']); ?></p>
+                        <p><strong>Date Registered:</strong> <?php echo htmlspecialchars($_SESSION['asset_details']['date_registered']); ?></p>
+                        <p><strong>Owner:</strong> <?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?></p>
                     </div>
                     <?php else: ?>
                     <p>No asset data available. Enter RFID UID/Secret to populate this section.</p>
                     <?php endif; ?>
                 </div>
 
-                <!-- Student and Officer Details Section -->
+                <!-- Student Details Section -->
                 <div class="right-section">
                     <h3>Student Details</h3>
                     <?php if (!empty($_SESSION['student_details'])): ?>
-                    <div class="student-section">
-                        <?php if (!empty($_SESSION['student_details']['myphoto'])): ?>
-                        <div class="photo-container">
-                            <img src="<?php echo htmlspecialchars($_SESSION['student_details']['myphoto']); ?>" alt="Student Picture">
-                        </div>
-                        <?php endif; ?>
-                        <p><strong>Name:</strong>
-                            <?php echo htmlspecialchars($_SESSION['student_details']['Username'] . ' ' . $_SESSION['student_details']['Lastname']); ?>
-                        </p>
-                        <p><strong>School:</strong>
-                            <?php echo htmlspecialchars($_SESSION['student_details']['School']); ?>
-                        </p>
-                        <p><strong>Registration Number:</strong>
-                            <?php echo htmlspecialchars($_SESSION['student_details']['Reg_Number']); ?>
-                        </p>
-                        <p><strong>Number of Assets Owned:</strong>
-                            <?php echo htmlspecialchars($_SESSION['assets_count']); ?>
-                        </p>
-                    </div>
-                    <?php if (!empty($_SESSION['officer_details'])): ?>
-                    <div class="officer-section">
-                        <h3>Officer Details</h3>
-                        <p><strong>Name:</strong>
-                            <?php echo htmlspecialchars($_SESSION['officer_details']['name'] . ' ' . $_SESSION['officer_details']['lastname']); ?>
-                        </p>
-                        <p><strong>Officer ID:</strong>
-                            <?php echo htmlspecialchars($_SESSION['officer_details']['officer_id']); ?>
-                        </p>
+                    <?php if (!empty($_SESSION['student_details']['myphoto'])): ?>
+                    <div class="photo-container">
+                        <img src="<?php echo htmlspecialchars($_SESSION['student_details']['myphoto']); ?>" alt="Student Picture">
                     </div>
                     <?php endif; ?>
+                    <p><strong>Name:</strong> <?php echo htmlspecialchars($_SESSION['student_details']['Username'] . ' ' . $_SESSION['student_details']['Lastname']); ?></p>
+                    <p><strong>School:</strong> <?php echo htmlspecialchars($_SESSION['student_details']['School']); ?></p>
+                    <p><strong>Registration Number:</strong> <?php echo htmlspecialchars($_SESSION['student_details']['Reg_Number']); ?></p>
+                    <p><strong>Assets Owned:</strong> <?php echo htmlspecialchars($_SESSION['assets_count']); ?></p>
                     <?php else: ?>
                     <p>No student data available. Scan a student QR code to populate this section.</p>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <!-- QR Code Scanner for Student -->
+            <!-- QR Code Scanner Section -->
             <div class="scanner-section">
-                <h3>Scan Student QR Code</h3>
-                <div id="qr-reader-student" style="width: 100%;"></div>
-                <div id="qr-reader-results-student"></div>
+                <h3>Student QR Code Scanner</h3>
+                <p>Scan a student's QR code to verify ownership against the scanned asset.</p>
+                <div id="qr-reader-student" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                <div id="qr-reader-results-student" style="margin-top: 15px;"></div>
             </div>
 
             <!-- Hidden form to submit scanned student data -->
@@ -591,6 +1070,8 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
             </form>
         </div>
     </div>
+    </div> <!-- Close content-wrapper -->
+    </div> <!-- Close admin-container -->
 
     <!-- Emergency Modal for Missing Assets -->
     <div id="missingAssetModal" class="modal emergency-modal" style="display: none;">
@@ -622,7 +1103,7 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
         </div>
     </div>
 
-   <script>
+    <script>
         // Function to periodically check for RFID data from text file
         function startRFIDListener() {
             console.log("Starting RFID listener");
@@ -859,7 +1340,7 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                     document.getElementById('missingAssetModal').style.display = 'none';
                 });
             });
-            
+
             // Close modal when clicking the acknowledge button
             const acknowledgeBtn = document.getElementById('acknowledgeBtn');
             if (acknowledgeBtn) {
@@ -867,7 +1348,7 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                     document.getElementById('missingAssetModal').style.display = 'none';
                 });
             }
-            
+
             // Close modal when clicking outside of it
             window.addEventListener('click', function(event) {
                 const modal = document.getElementById('missingAssetModal');
@@ -875,33 +1356,40 @@ if (!empty($_SESSION['asset_details']) && isset($_SESSION['asset_details']['Asse
                     modal.style.display = 'none';
                 }
             });
-            
+
             // Check if we need to show the missing asset modal on page load
             <?php if ($show_missing_modal): ?>
             // Populate missing asset details
             const missingAssetDetails = document.getElementById('missingAssetDetails');
             if (missingAssetDetails) {
                 missingAssetDetails.innerHTML = `
-                    <div class="missing-detail"><strong>Serial Number:</strong> 
-                        <?php echo htmlspecialchars($_SESSION['asset_details']['serial_number']); ?></div>
-                    <div class="missing-detail"><strong>Model:</strong> 
-                        <?php echo htmlspecialchars($_SESSION['asset_details']['item_model']); ?></div>
-                    <div class="missing-detail"><strong>Owner:</strong> 
-                        <?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?></div>
-                    <div class="missing-detail"><strong>Date Reported Missing:</strong> 
-                        <?php echo !empty($_SESSION['asset_details']['date_reported_missing']) ? 
-                            date('Y-m-d', strtotime($_SESSION['asset_details']['date_reported_missing'])) : 
-                            'Unknown'; ?></div>
+                    <div class="detail-item"><span>Serial Number:</span> <span><?php echo htmlspecialchars($_SESSION['asset_details']['serial_number']); ?></span></div>
+                    <div class="detail-item"><span>Model:</span> <span><?php echo htmlspecialchars($_SESSION['asset_details']['item_model']); ?></span></div>
+                    <div class="detail-item"><span>Owner:</span> <span><?php echo htmlspecialchars($_SESSION['asset_details']['Username'] . ' ' . $_SESSION['asset_details']['Lastname']); ?></span></div>
+                    <div class="detail-item"><span>Date Reported Missing:</span> <span><?php echo !empty($_SESSION['asset_details']['date_reported_missing']) ? date('Y-m-d', strtotime($_SESSION['asset_details']['date_reported_missing'])) : date('Y-m-d'); ?></span></div>
                 `;
             }
-            
+
             // Show the modal
             document.getElementById('missingAssetModal').style.display = 'block';
             <?php endif; ?>
+
         });
         
         // Start RFID listener
         document.addEventListener('DOMContentLoaded', startRFIDListener);
+
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+        });
     </script>
 </body>
 

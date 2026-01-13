@@ -66,492 +66,583 @@ if (!$users_query) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="responsive.css">
     <title>Admin - User Management</title>
     <style>
-        :root {
-            --primary: #4e73df;
-            --success: #1cc88a;
-            --info: #36b9cc;
-            --warning: #f6c23e;
-            --danger: #e74a3b;
-            --secondary: #858796;
-            --light: #f8f9fc;
-            --dark: #5a5c69;
-        }
-        
-        body {
-            overflow-x: hidden;
-            background-color: #f8f9fc;
-            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        .content-wrapper {
-            margin-left: 250px;
-            width: calc(100% - 250px);
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: modalopen 0.3s;
         }
 
-        .admin-container {
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
-            min-height: 100vh;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .btn-submit, .btn-delete, .btn-cancel {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
             color: white;
-            min-height: 100vh;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.view {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .action-btn.edit {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .action-btn.delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-btn.assets {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        /* Admin Actions Container */
+        .admin-actions {
+            margin-top: 15px;
+        }
+
+        /* User Card Styles */
+        .asset-info {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .asset-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-teal), var(--primary-dark));
+        }
+
+        .asset-info h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .asset-info p {
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        .asset-info b {
+            color: var(--accent-teal);
+        }
+
+        .asset-content {
+            position: relative;
+            z-index: 0;
+        }
+
+        /* Add User Button Styles */
+        .add-user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-user-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .add-user-btn:hover::before {
+            left: 100%;
+        }
+
+        .add-user-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            background: linear-gradient(135deg, #0056b3, #004085);
+        }
+
+        .add-user-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .add-user-btn i {
+            font-size: 18px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .user-photo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-dark);
+        }
+
+        .user-stats {
+            background: rgba(75, 100, 141, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .user-stats h4 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent-teal);
+        }
+
+        /* Dashboard Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #4b648d, #41737c);
+            color: #ffffff;
             position: fixed;
             top: 0;
             left: 0;
-        }
-        
-        .sidebar-brand {
-            height: 70px;
+            height: 100%;
+            z-index: 100;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 800;
-            padding: 1.5rem 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-brand .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
         .sidebar-menu {
-            padding: 0;
+            padding: 2rem 0;
             list-style: none;
+            flex: 1;
         }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
+
+        .sidebar-menu li a {
             display: block;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
-        
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #e7fbf9;
+            transform: translateX(5px);
         }
-        
+
         .sidebar-menu i {
             margin-right: 0.5rem;
             width: 20px;
             text-align: center;
         }
-        
-        .content-wrapper {
-            flex: 1;
-            margin-left: 250px;
-            padding: 20px;
-        }
-        
-        .topbar {
-            height: 70px;
-            background-color: white;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .topbar h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--dark);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-info span {
-            margin-right: 1rem;
-            color: var(--dark);
-        }
-        
-        .logout-btn {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .logout-btn:hover {
-            background-color: #c82333;
-        }
-        
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            background-color: white;
-            padding: 1rem;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        .filter-group {
-            display: flex;
-            align-items: center;
-        }
-        
-        .filter-group label {
-            margin-right: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .filter-group select, .filter-group input {
-            padding: 0.5rem;
-            border: 1px solid #d1d3e2;
-            border-radius: 0.35rem;
-            margin-right: 1rem;
-        }
-        
-        .filter-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .filter-btn:hover {
-            background-color: #2e59d9;
-        }
-        
-        .add-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-        
-        .add-btn i {
-            margin-right: 0.5rem;
-        }
-        
-        .add-btn:hover {
-            background-color: #17a673;
-            color: white;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 0.35rem;
-            overflow: hidden;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        table th, table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e3e6f0;
-        }
-        
-        table th {
-            background-color: #f8f9fc;
-            color: var(--dark);
-            font-weight: 700;
-        }
-        
-        table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .status {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-        
-        .status.active {
-            background-color: #e3fcef;
-            color: #1cc88a;
-        }
-        
-        .status.inactive {
-            background-color: #f8d7da;
-            color: #e74a3b;
-        }
-        
-        .action-btn {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            margin-right: 0.5rem;
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-        
-        .action-btn.edit {
-            background-color: var(--info);
-            color: white;
-        }
-        
-        .action-btn.edit:hover {
-            background-color: #2a96a5;
-            color: white;
-        }
-        
-        .action-btn.activate {
-            background-color: var(--success);
-            color: white;
-        }
-        
-        .action-btn.activate:hover {
-            background-color: #17a673;
-            color: white;
-        }
-        
-        .action-btn.deactivate {
-            background-color: var(--warning);
-            color: #5a5c69;
-        }
-        
-        .action-btn.deactivate:hover {
-            background-color: #dda20a;
-            color: #5a5c69;
-        }
-        
-        .action-btn.delete {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .action-btn.delete:hover {
-            background-color: #c82333;
-            color: white;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-        
-        .pagination a, .pagination span {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            margin: 0 0.25rem;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            color: var(--primary);
-            background-color: white;
-            border: 1px solid #dddfeb;
-            transition: all 0.3s;
-        }
-        
-        .pagination a:hover {
-            background-color: #eaecf4;
-            border-color: #dddfeb;
-        }
-        
-        .pagination a.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .pagination .disabled {
-            color: #b7b9cc;
-            pointer-events: none;
-            cursor: default;
-        }
-        
-        .message {
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0.35rem;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .user-photo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
+
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-shield-alt"></i> Admin Portal
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-shield-alt" style="font-size: 50px; color: white;"></i>
+                    <div class="title">Admin Portal</div>
+                </div>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="admin_assets.php"><i class="fas fa-laptop"></i> Assets</a></li>
-                <li><a href="admin_users.php" class="active"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="scpersonnel.php"><i class="fas fa-user-shield"></i> Security Personnel</a></li>
-                <li><a href="admin_logs.php"><i class="fas fa-history"></i> System Logs</a></li>
-                <li><a href="admin_settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="admin_logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li>
+                    <a href="admin_dashboard.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_assets.php">
+                        <i class="fas fa-laptop"></i> Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_users.php" class="active">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_security_approvals.php">
+                        <i class="fas fa-user-shield"></i> Security Personnel
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_logs.php">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_settings.php">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="welcome.php">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
         
-        <!-- Main Content -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
-                <h1>User Management</h1>
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>User Management</h1>
+                </div>
                 <div class="user-info">
                     <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
-                    <a href="admin_logout.php" class="logout-btn">Logout</a>
+                    <i class="fas fa-user-shield" style="font-size: 24px;"></i>
                 </div>
             </div>
             
-            <!-- Display Messages -->
-            <?php if (isset($_SESSION['admin_message'])): ?>
-                <div class="message <?php echo $_SESSION['admin_message_type']; ?>">
-                    <?php echo $_SESSION['admin_message']; ?>
-                </div>
-                <?php 
-                // Clear the message after displaying
-                unset($_SESSION['admin_message']);
-                unset($_SESSION['admin_message_type']);
-                ?>
-            <?php endif; ?>
-            
-            <!-- Users Table -->
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-users"></i> All Users</h2>
-                    <div>
-                        <a href="admin_add_user.php" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add New User
-                        </a>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Display Messages -->
+                <?php if (isset($_SESSION['admin_message'])): ?>
+                    <div class="message <?php echo $_SESSION['admin_message_type']; ?>">
+                        <?php echo $_SESSION['admin_message']; ?>
                     </div>
+                    <?php 
+                    // Clear the message after displaying
+                    unset($_SESSION['admin_message']);
+                    unset($_SESSION['admin_message_type']);
+                    ?>
+                <?php endif; ?>
+                
+                <!-- Add User Button -->
+                <div class="filters-section" style="margin-bottom: 20px;">
+                    <a href="admin_add_user.php" class="add-user-btn">
+                        <i class="fas fa-user-plus"></i> Add New User
+                    </a>
                 </div>
-                <div class="card-body">
+                
+                <!-- Users Display -->
+                <div class="main-box">
+                    <h2><i class="fas fa-users"></i> All Users</h2>
+                    
                     <?php if (isset($query_error)): ?>
-                        <div class="alert alert-danger">
+                        <div class="message error">
                             <?php echo $query_error; ?>
                         </div>
                     <?php elseif (mysqli_num_rows($users_query) == 0): ?>
-                        <p>No users found in the database.</p>
+                        <p style="text-align: center; padding: 20px;">No users found in the database.</p>
                     <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Reg Number</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>School</th>
-                                        <th>Assets</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($user = mysqli_fetch_assoc($users_query)): ?>
-                                        <?php
-                                        // Count user's assets
-                                        $reg_number = isset($user['Reg_Number']) ? $user['Reg_Number'] : '';
-                                        $asset_count_query = mysqli_query($con, "SELECT COUNT(*) as count FROM assets WHERE reg_number = '$reg_number'");
-                                        $asset_count = 0;
-                                        
-                                        if ($asset_count_query) {
-                                            $asset_count = mysqli_fetch_assoc($asset_count_query)['count'];
-                                        }
-                                        ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($user['Id']); ?></td>
-                                            <td><?php echo isset($user['Reg_Number']) ? htmlspecialchars($user['Reg_Number']) : 'N/A'; ?></td>
-                                            <td>
-                                                <?php 
-                                                $name = '';
-                                                if (isset($user['Username'])) {
-                                                    $name .= $user['Username'];
-                                                }
-                                                if (isset($user['Lastname'])) {
-                                                    $name .= ' ' . $user['Lastname'];
-                                                }
-                                                echo !empty($name) ? $name : 'N/A';
-                                                ?>
-                                            </td>
-                                            <td><?php echo isset($user['Email']) ? htmlspecialchars($user['Email']) : 'N/A'; ?></td>
-                                            <td><?php echo isset($user['Phone']) ? htmlspecialchars($user['Phone']) : 'N/A'; ?></td>
-                                            <td><?php echo isset($user['School']) ? htmlspecialchars($user['School']) : 'N/A'; ?></td>
-                                            <td><?php echo $asset_count; ?></td>
-                                            <td>
-                                                <a href="admin_view_user.php?id=<?php echo $user['Id']; ?>" class="btn btn-info btn-sm">
-                                                    <i class="fas fa-eye"></i> View
+                        <?php while ($user = mysqli_fetch_assoc($users_query)): ?>
+                            <?php
+                            // Count user's assets
+                            $reg_number = isset($user['Reg_Number']) ? $user['Reg_Number'] : '';
+                            $asset_count_query = mysqli_query($con, "SELECT COUNT(*) as count FROM assets WHERE reg_number = '$reg_number'");
+                            $asset_count = 0;
+                            
+                            if ($asset_count_query) {
+                                $asset_count = mysqli_fetch_assoc($asset_count_query)['count'];
+                            }
+                            ?>
+                            <div class="asset-info">
+                                <div class="asset-content">
+                                    <h3><?php echo htmlspecialchars($user['Username'] . ' ' . $user['Lastname']); ?></h3>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                                        <div style="flex: 2; min-width: 300px;">
+                                            <p><b>User ID:</b> <?php echo htmlspecialchars($user['Id']); ?></p>
+                                            <p><b>Registration Number:</b> <?php echo isset($user['Reg_Number']) ? htmlspecialchars($user['Reg_Number']) : 'N/A'; ?></p>
+                                            <p><b>Email:</b> <?php echo isset($user['Email']) ? htmlspecialchars($user['Email']) : 'N/A'; ?></p>
+                                            <p><b>Phone:</b> <?php echo isset($user['Phone']) ? htmlspecialchars($user['Phone']) : 'N/A'; ?></p>
+                                            <p><b>School:</b> <?php echo isset($user['School']) ? htmlspecialchars($user['School']) : 'N/A'; ?></p>
+                                            
+                                            <div class="user-stats">
+                                                <h4><i class="fas fa-chart-bar"></i> User Statistics</h4>
+                                                <div class="stat-item">
+                                                    <span>Registered Assets:</span>
+                                                    <span class="stat-value"><?php echo $asset_count; ?></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Admin Actions -->
+                                            <div class="admin-actions" style="margin-top: 15px;">
+                                                <a href="admin_view_user.php?id=<?php echo $user['Id']; ?>" class="action-btn view">
+                                                    <i class="fas fa-eye"></i> View Details
                                                 </a>
-                                                <a href="admin_edit_user.php?id=<?php echo $user['Id']; ?>" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-edit"></i> Edit
+                                                <a href="admin_edit_user.php?id=<?php echo $user['Id']; ?>" class="action-btn edit">
+                                                    <i class="fas fa-edit"></i> Edit User
                                                 </a>
-                                                <?php if ($asset_count == 0): ?>
-                                                    <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user['Id']; ?>">
-                                                        <input type="hidden" name="user_name" value="<?php echo isset($user['Username']) ? $user['Username'] . ' ' . $user['Lastname'] : 'Unknown'; ?>">
-                                                        <input type="hidden" name="user_reg" value="<?php echo isset($user['Reg_Number']) ? $user['Reg_Number'] : ''; ?>">
-                                                        <button type="submit" name="delete_user" class="btn btn-danger btn-sm">
-                                                            <i class="fas fa-trash"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                <?php else: ?>
-                                                    <button class="btn btn-secondary btn-sm" disabled title="Cannot delete user with assets">
-                                                        <i class="fas fa-trash"></i> Delete
-                                                    </button>
-                                                    
-                                                    <!-- Add View Assets button -->
-                                                    <a href="admin_user_assets.php?reg_number=<?php echo urlencode($user['Reg_Number']); ?>" class="btn btn-warning btn-sm">
-                                                        <i class="fas fa-laptop"></i> View Assets
+                                                <?php if ($asset_count > 0): ?>
+                                                    <a href="admin_user_assets.php?reg_number=<?php echo urlencode($user['Reg_Number']); ?>" class="action-btn assets">
+                                                        <i class="fas fa-laptop"></i> View Assets (<?php echo $asset_count; ?>)
                                                     </a>
                                                 <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                                <?php if ($asset_count == 0): ?>
+                                                    <button type="button" class="action-btn delete" onclick="deleteUser(<?php echo $user['Id']; ?>, '<?php echo htmlspecialchars($user['Username'] . ' ' . $user['Lastname']); ?>', '<?php echo htmlspecialchars($user['Reg_Number']); ?>')">
+                                                        <i class="fas fa-trash"></i> Delete User
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="action-btn delete" disabled title="Cannot delete user with assets" style="opacity: 0.5; cursor: not-allowed;">
+                                                        <i class="fas fa-trash"></i> Delete User
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="flex: 1; min-width: 220px;">
+                                            <div class="asset-details-container" style="display: flex; flex-direction: column; gap: 20px;">
+                                                <?php if (!empty($user['myphoto'])): ?>
+                                                    <div class="asset-image">
+                                                        <h4><i class="fas fa-camera"></i> User Photo</h4>
+                                                        <img src="<?php echo htmlspecialchars($user['myphoto']); ?>" alt="User Photo">
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-trash"></i> Delete User</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+                <p><strong>User:</strong> <span id="deleteUserName"></span></p>
+                <p><strong>Registration Number:</strong> <span id="deleteUserReg"></span></p>
+                <form id="deleteForm" action="" method="post">
+                    <input type="hidden" name="user_id" id="deleteUserId">
+                    <input type="hidden" name="user_name" id="deleteUserNameInput">
+                    <input type="hidden" name="user_reg" id="deleteUserRegInput">
+                    <button type="submit" name="delete_user" class="btn-delete">Yes, Delete User</button>
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/particles.js"></script>
+    <script src="js/home.js"></script>
+    <script>
+        // Modal functionality
+        var deleteModal = document.getElementById('deleteModal');
+        var closeBtns = document.getElementsByClassName('close');
+
+        function deleteUser(userId, userName, userReg) {
+            document.getElementById('deleteUserId').value = userId;
+            document.getElementById('deleteUserNameInput').value = userName;
+            document.getElementById('deleteUserRegInput').value = userReg;
+            document.getElementById('deleteUserName').textContent = userName;
+            document.getElementById('deleteUserReg').textContent = userReg;
+            deleteModal.style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+        }
+
+        for (var i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].onclick = function() {
+                deleteModal.style.display = 'none';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

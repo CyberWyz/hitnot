@@ -108,390 +108,431 @@ $assets_query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Reg_Nu
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="responsive.css">
     <title>Admin - <?php echo $page_title; ?></title>
     <style>
-        :root {
-            --primary: #4e73df;
-            --success: #1cc88a;
-            --info: #36b9cc;
-            --warning: #f6c23e;
-            --danger: #e74a3b;
-            --secondary: #858796;
-            --light: #f8f9fc;
-            --dark: #5a5c69;
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
         }
-        
-        body {
-            background-color: #f8f9fc;
-            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: modalopen 0.3s;
         }
-        
-        .admin-container {
+
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
-            min-height: 100vh;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .btn-submit, .btn-delete, .btn-cancel {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit {
+            background-color: #28a745;
             color: white;
-            min-height: 100vh;
+        }
+
+        .btn-submit:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Action buttons */
+        .action-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.view {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .action-btn.edit {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .action-btn.update {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        /* Status Overlay Styles */
+        .status-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            border-radius: var(--border-radius);
+        }
+
+        .missing-overlay {
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+
+        .blacklisted-overlay {
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+
+        .status-text {
+            font-size: 48px;
+            font-weight: bold;
+            transform: rotate(-15deg);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 5px;
+        }
+
+        .missing-text {
+            color: #dc3545;
+        }
+
+        .blacklisted-text {
+            color: #ff8c00;
+        }
+
+        /* Add Asset Button Styles */
+        .add-asset-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-asset-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .add-asset-btn:hover::before {
+            left: 100%;
+        }
+
+        .add-asset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #218838, #1aa085);
+        }
+
+        .add-asset-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Add Asset Button Styles (matching user button style) */
+        .add-asset-btn-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-asset-btn-inline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .add-asset-btn-inline:hover::before {
+            left: 100%;
+        }
+
+        .add-asset-btn-inline:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            background: linear-gradient(135deg, #0056b3, #004085);
+        }
+
+        .add-asset-btn-inline:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Dashboard Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #4b648d, #41737c);
+            color: #ffffff;
             position: fixed;
             top: 0;
             left: 0;
-        }
-        
-        .sidebar-brand {
-            height: 70px;
+            height: 100%;
+            z-index: 100;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 800;
-            padding: 1.5rem 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-brand .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
         .sidebar-menu {
-            padding: 0;
+            padding: 2rem 0;
             list-style: none;
+            flex: 1;
         }
-        
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
+
+        .sidebar-menu li a {
             display: block;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
-        
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #e7fbf9;
+            transform: translateX(5px);
         }
-        
+
         .sidebar-menu i {
             margin-right: 0.5rem;
             width: 20px;
             text-align: center;
         }
-        
-        .content-wrapper {
-            flex: 1;
-            margin-left: 250px;
-            padding: 20px;
-        }
-        
-        .topbar {
-            height: 70px;
-            background-color: white;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .topbar h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--dark);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-info span {
-            margin-right: 1rem;
-            color: var(--dark);
-        }
-        
-        .logout-btn {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .logout-btn:hover {
-            background-color: #c82333;
-        }
-        
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            background-color: white;
-            padding: 1rem;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        .filter-group {
-            display: flex;
-            align-items: center;
-        }
-        
-        .filter-group label {
-            margin-right: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .filter-group select, .filter-group input {
-            padding: 0.5rem;
-            border: 1px solid #d1d3e2;
-            border-radius: 0.35rem;
-            margin-right: 1rem;
-        }
-        
-        .filter-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .filter-btn:hover {
-            background-color: #2e59d9;
-        }
-        
-        .add-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-        
-        .add-btn i {
-            margin-right: 0.5rem;
-        }
-        
-        .add-btn:hover {
-            background-color: #17a673;
-            color: white;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            border-radius: 0.35rem;
-            overflow: hidden;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        table th, table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e3e6f0;
-        }
-        
-        table th {
-            background-color: #f8f9fc;
-            color: var(--dark);
-            font-weight: 700;
-        }
-        
-        table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .status {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-        
-        .status-Active {
-            background-color: #e3fcef;
-            color: #1cc88a;
-        }
-        
-        .status-Inactive {
-            background-color: #f8d7da;
-            color: #e74a3b;
-        }
-        
-        .status-Missing {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-Blacklisted {
-            background-color: #343a40;
-            color: white;
-        }
-        
-        .status-Recovered {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-        
-        .action-btn {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            margin-right: 0.5rem;
-            text-decoration: none;
-            font-size: 0.875rem;
-        }
-        
-        .action-btn.edit {
-            background-color: var(--info);
-            color: white;
-        }
-        
-        .action-btn.edit:hover {
-            background-color: #2a96a5;
-            color: white;
-        }
-        
-        .action-btn.delete {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .action-btn.delete:hover {
-            background-color: #c82333;
-            color: white;
-        }
-        
-        .action-btn.update {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .action-btn.update:hover {
-            background-color: #2e59d9;
-            color: white;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 1.5rem;
-        }
-        
-        .pagination a, .pagination span {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            margin: 0 0.25rem;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            color: var(--primary);
-            background-color: white;
-            border: 1px solid #dddfeb;
-            transition: all 0.3s;
-        }
-        
-        .pagination a:hover {
-            background-color: #eaecf4;
-            border-color: #dddfeb;
-        }
-        
-        .pagination a.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .pagination .disabled {
-            color: #b7b9cc;
-            pointer-events: none;
-            cursor: default;
-        }
-        
-        .message {
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0.35rem;
-        }
-        
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .asset-photo {
-            width: 50px;
-            height: 50px;
-            border-radius: 4px;
-            object-fit: cover;
-        }
-        
-        .form-control {
-            padding: 0.5rem;
-            border: 1px solid #d1d3e2;
-            border-radius: 0.35rem;
-            margin-right: 0.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
+
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-shield-alt"></i> Admin Portal
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-shield-alt" style="font-size: 50px; color: white;"></i>
+                    <div class="title">Admin Portal</div>
+                </div>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="admin_assets.php" class="active"><i class="fas fa-laptop"></i> Assets</a></li>
-                <li><a href="admin_users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="admin_security.php"><i class="fas fa-user-shield"></i> Security Personnel</a></li>
-                <li><a href="admin_logs.php"><i class="fas fa-history"></i> System Logs</a></li>
-                <li><a href="admin_settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="admin_logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li>
+                    <a href="admin_dashboard.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_assets.php" class="active">
+                        <i class="fas fa-laptop"></i> Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_users.php">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_security_approvals.php">
+                        <i class="fas fa-user-shield"></i> Security Personnel
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_logs.php">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_settings.php">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="welcome.php">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
         
-        <!-- Main Content -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
-                <h1><?php echo $page_title; ?></h1>
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><?php echo $page_title; ?></h1>
+                </div>
                 <div class="user-info">
                     <span>Welcome, <?php echo $_SESSION['admin_username']; ?></span>
-                    <a href="admin_logout.php" class="logout-btn">Logout</a>
+                    <i class="fas fa-user-shield" style="font-size: 24px;"></i>
                 </div>
             </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
             
             <!-- Display Messages -->
             <?php if (isset($_SESSION['admin_message'])): ?>
@@ -505,137 +546,232 @@ $assets_query = mysqli_query($con, "SELECT a.*, u.Username, u.Lastname, u.Reg_Nu
                 ?>
             <?php endif; ?>
             
-            <!-- Filters and Add Asset Button -->
-            <div class="filters">
-                <div class="filter-group">
-                    <form action="" method="get">
-                        <label for="status">Status:</label>
-                        <select name="status" id="status" class="form-control">
-                            <option value="">All</option>
-                            <option value="Active" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Active' ? 'selected' : ''); ?>>Active</option>
-                            <option value="Inactive" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Inactive' ? 'selected' : ''); ?>>Inactive</option>
-                            <option value="Missing" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Missing' ? 'selected' : ''); ?>>Missing</option>
-                            <option value="Blacklisted" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Blacklisted' ? 'selected' : ''); ?>>Blacklisted</option>
-                            <option value="Recovered" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Recovered' ? 'selected' : ''); ?>>Recovered</option>
-                        </select>
+                <!-- Filters and Add Asset Button -->
+                <div class="filters-section" style="margin-bottom: 20px;">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <form action="" method="get">
+                                <label for="status">Status:</label>
+                                <select name="status" id="status" class="form-control">
+                                    <option value="">All</option>
+                                    <option value="Active" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Active' ? 'selected' : ''); ?>>Active</option>
+                                    <option value="Inactive" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Inactive' ? 'selected' : ''); ?>>Inactive</option>
+                                    <option value="Missing" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Missing' ? 'selected' : ''); ?>>Missing</option>
+                                    <option value="Blacklisted" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Blacklisted' ? 'selected' : ''); ?>>Blacklisted</option>
+                                    <option value="Recovered" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Recovered' ? 'selected' : ''); ?>>Recovered</option>
+                                </select>
+                                
+                                <label for="search">Search:</label>
+                                <input type="text" name="search" id="search" class="form-control" placeholder="Serial, Model, Description" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                                
+                                <button type="submit" class="filter-btn">Filter</button>
+                            </form>
+                        </div>
                         
-                        <label for="search">Search:</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Serial, Model, Description" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                        
-                        <button type="submit" class="filter-btn">Filter</button>
-                    </form>
+                        <div style="margin-top: 15px;">
+                            <a href="admin_add_asset.php" class="add-asset-btn-inline">
+                                <i class="fas fa-plus-circle"></i> Add New Asset
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                
-                <a href="admin_add_asset.php" class="add-btn"><i class="fas fa-plus"></i> Add New Asset</a>
-            </div>
             
-            <!-- Assets Table -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Serial</th>
-                        <th>Model</th>
-                        <th>Description</th>
-                        <th>Owner</th>
-                        <th>Status</th>
-                        <th>Registered</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+                <!-- Assets Display -->
+                <div class="main-box">
+                    <h2><i class="fas fa-laptop"></i> Asset Management</h2>
+                    
                     <?php if (mysqli_num_rows($assets_query) > 0): ?>
                         <?php while ($asset = mysqli_fetch_assoc($assets_query)): ?>
-                            <tr>
-                                <td>
-                                    <?php if (!empty($asset['picture']) && file_exists($asset['picture'])): ?>
-                                        <img src="<?php echo htmlspecialchars($asset['picture']); ?>" alt="Asset Photo" class="asset-photo">
-                                    <?php elseif (!empty($asset['picture']) && file_exists("uploads/" . $asset['picture'])): ?>
-                                        <img src="uploads/<?php echo htmlspecialchars($asset['picture']); ?>" alt="Asset Photo" class="asset-photo">
-                                    <?php else: ?>
-                                        <img src="uploads/default-asset.png" alt="Default Photo" class="asset-photo">
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($asset['serial_number']); ?></td>
-                                <td><?php echo htmlspecialchars($asset['item_model']); ?></td>
-                                <td><?php echo htmlspecialchars($asset['item_description']); ?></td>
-                                <td>
-                                    <?php if (!empty($asset['Username'])): ?>
-                                        <?php echo htmlspecialchars($asset['Username'] . ' ' . $asset['Lastname']); ?>
-                                        <br><small><?php echo htmlspecialchars($asset['Reg_Number']); ?></small>
-                                    <?php else: ?>
-                                        <em>Unassigned</em>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="status status-<?php echo $asset['AssetStatus'] ?? 'Active'; ?>">
-                                        <?php echo $asset['AssetStatus'] ?? 'Active'; ?>
-                                    </span>
-                                </td>
-                                <td><?php echo date('Y-m-d', strtotime($asset['date_registered'])); ?></td>
-                                <td>
-                                    <!-- Status Change Form -->
-                                    <form method="post" action="" class="d-inline">
-                                        <input type="hidden" name="asset_id" value="<?php echo $asset['item_id']; ?>">
-                                        <select name="new_status" class="form-control" style="width: auto; display: inline-block;">
-                                            <option value="">Change Status</option>
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                            <option value="Missing">Missing</option>
-                                            <option value="Blacklisted">Blacklisted</option>
-                                            <option value="Recovered">Recovered</option>
-                                        </select>
-                                        <input type="text" name="reason" placeholder="Reason" class="form-control" style="width: 100px; display: inline-block;">
-                                        <button type="submit" name="change_status" class="action-btn update"><i class="fas fa-sync-alt"></i> Update</button>
-                                    </form>
-                                    
-                                    <a href="admin_edit_asset.php?id=<?php echo $asset['item_id']; ?>" class="action-btn edit"><i class="fas fa-edit"></i> Edit</a>
-                                    
-                                    <form method="post" action="" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this asset? This action cannot be undone.');">
-                                        <input type="hidden" name="asset_id" value="<?php echo $asset['item_id']; ?>">
-                                        <button type="submit" name="delete_asset" class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
+                            <div class="asset-info">
+                                <?php if (isset($asset['AssetStatus']) && $asset['AssetStatus'] == 'Missing'): ?>
+                                    <div class="status-overlay missing-overlay">
+                                        <div class="status-text missing-text">MISSING</div>
+                                    </div>
+                                <?php elseif (isset($asset['AssetStatus']) && $asset['AssetStatus'] == 'Blacklisted'): ?>
+                                    <div class="status-overlay blacklisted-overlay">
+                                        <div class="status-text blacklisted-text">CONFISCATED</div>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <div class="asset-content">
+                                    <h3><?php echo htmlspecialchars($asset['item_description']); ?></h3>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                                        <div style="flex: 2; min-width: 300px;">
+                                            <p><b>Serial Number:</b> <?php echo htmlspecialchars($asset['serial_number']); ?></p>
+                                            <p><b>Date Registered:</b> <?php echo htmlspecialchars($asset['date_registered']); ?></p>
+                                            <p><b>Item Model:</b> <?php echo htmlspecialchars($asset['item_model']); ?></p>
+                                            <p><b>Owner:</b> <?php echo htmlspecialchars($asset['Username'] . ' ' . $asset['Lastname'] . ' (' . $asset['Reg_Number'] . ')'); ?></p>
+                                            
+                                            <?php if (isset($asset['AssetStatus']) && $asset['AssetStatus'] == 'Missing'): ?>
+                                                <div class="status-info missing">
+                                                    <p><b>Status:</b> <span class="status status-Missing">MISSING</span></p>
+                                                    <p><b>Reported Missing On:</b> <?php echo date('Y-m-d H:i', strtotime($asset['date_reported_missing'])); ?></p>
+                                                </div>
+                                            <?php elseif (isset($asset['AssetStatus']) && $asset['AssetStatus'] == 'Blacklisted'): ?>
+                                                <div class="status-info blacklisted">
+                                                    <p><b>Status:</b> <span class="status status-Blacklisted">CONFISCATED</span></p>
+                                                    <p><b>Date Confiscated:</b> <?php echo date('Y-m-d H:i', strtotime($asset['date_blacklisted'])); ?></p>
+                                                    <p><b>Message:</b> This asset has been confiscated at a security checkpoint. Please visit the security office to confirm ownership.</p>
+                                                    <?php if (!empty($asset['blacklist_reason'])): ?>
+                                                        <p><b>Reason:</b> <?php echo htmlspecialchars($asset['blacklist_reason']); ?></p>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php elseif (!isset($asset['AssetStatus']) || $asset['AssetStatus'] == NULL): ?>
+                                                <p><b>Status:</b> <span class="status status-Active">ACTIVE</span></p>
+                                            <?php else: ?>
+                                                <p><b>Status:</b> <span class="status status-<?php echo $asset['AssetStatus']; ?>"><?php echo strtoupper($asset['AssetStatus']); ?></span></p>
+                                            <?php endif; ?>
+                                            
+                                            <!-- Admin Actions -->
+                                            <div class="admin-actions" style="margin-top: 15px;">
+                                                <a href="admin_view_asset.php?id=<?php echo $asset['item_id']; ?>" class="action-btn view">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="admin_edit_asset.php?id=<?php echo $asset['item_id']; ?>" class="action-btn edit">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <button type="button" class="action-btn update" onclick="changeStatus(<?php echo $asset['item_id']; ?>, '<?php echo $asset['AssetStatus'] ?? 'Active'; ?>')">
+                                                    <i class="fas fa-exchange-alt"></i> Change Status
+                                                </button>
+                                                <button type="button" class="action-btn delete" onclick="deleteAsset(<?php echo $asset['item_id']; ?>)">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="flex: 1; min-width: 220px;">
+                                            <div class="asset-details-container" style="display: flex; flex-direction: column; gap: 20px;">
+                                                <?php if (!empty($asset['picture'])): ?>
+                                                    <div class="asset-image">
+                                                        <h4><i class="fas fa-camera"></i> Asset Picture</h4>
+                                                        <img src="<?php echo htmlspecialchars($asset['picture']); ?>" alt="Asset Image">
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <?php if (!empty($asset['qr_code'])): ?>
+                                                    <div class="qr-code">
+                                                        <h4><i class="fas fa-qrcode"></i> QR Code</h4>
+                                                        <img src="<?php echo htmlspecialchars($asset['qr_code']); ?>" alt="QR Code">
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="8" style="text-align: center;">No assets found</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            
-            <!-- Pagination -->
-            <?php if ($total_pages > 1): ?>
-                <div class="pagination">
-                    <?php if ($page > 1): ?>
-                        <a href="?page=1<?php echo isset($_GET['status']) ? '&status=' . $_GET['status'] : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>"><i class="fas fa-angle-double-left"></i></a>
-                        <a href="?page=<?php echo $page - 1; ?><?php echo isset($_GET['status']) ? '&status=' . $_GET['status'] : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>"><i class="fas fa-angle-left"></i></a>
-                    <?php else: ?>
-                        <span class="disabled"><i class="fas fa-angle-double-left"></i></span>
-                        <span class="disabled"><i class="fas fa-angle-left"></i></span>
-                    <?php endif; ?>
-                    
-                    <?php
-                        $start_page = max(1, $page - 2);
-                        $end_page = min($total_pages, $page + 2);
-                        
-                        for ($i = $start_page; $i <= $end_page; $i++):
-                    ?>
-                        <a href="?page=<?php echo $i; ?><?php echo isset($_GET['status']) ? '&status=' . $_GET['status'] : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                    <?php endfor; ?>
-                    
-                    <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1; ?><?php echo isset($_GET['status']) ? '&status=' . $_GET['status'] : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>"><i class="fas fa-angle-right"></i></a>
-                        <a href="?page=<?php echo $total_pages; ?><?php echo isset($_GET['status']) ? '&status=' . $_GET['status'] : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>"><i class="fas fa-angle-double-right"></i></a>
-                    <?php else: ?>
-                        <span class="disabled"><i class="fas fa-angle-right"></i></span>
-                        <span class="disabled"><i class="fas fa-angle-double-right"></i></span>
+                        <p style="text-align: center; padding: 20px;">No assets found matching the criteria.</p>
                     <?php endif; ?>
                 </div>
-            <?php endif; ?>
+            
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>">&laquo; Previous</a>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                            <a href="?page=<?php echo $i; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                            <a href="?page=<?php echo $page + 1; ?><?php echo isset($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>">Next &raquo;</a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
+</body>
+</html>
+    <!-- Status Change Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-exchange-alt"></i> Change Asset Status</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="statusForm" action="" method="post">
+                    <input type="hidden" name="asset_id" id="modalAssetId">
+                    <div class="form-group">
+                        <label for="new_status">New Status:</label>
+                        <select name="new_status" id="new_status" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Missing">Missing</option>
+                            <option value="Blacklisted">Blacklisted</option>
+                            <option value="Recovered">Recovered</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reason">Reason:</label>
+                        <textarea name="reason" id="reason" rows="3" placeholder="Enter reason for status change..." required></textarea>
+                    </div>
+                    <button type="submit" name="change_status" class="btn-submit">Update Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-trash"></i> Delete Asset</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this asset? This action cannot be undone.</p>
+                <form id="deleteForm" action="" method="post">
+                    <input type="hidden" name="asset_id" id="deleteAssetId">
+                    <button type="submit" name="delete_asset" class="btn-delete">Yes, Delete Asset</button>
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/particles.js"></script>
+    <script src="js/home.js"></script>
+    <script>
+        // Modal functionality
+        var statusModal = document.getElementById('statusModal');
+        var deleteModal = document.getElementById('deleteModal');
+        var closeBtns = document.getElementsByClassName('close');
+
+        function changeStatus(assetId, currentStatus) {
+            document.getElementById('modalAssetId').value = assetId;
+            document.getElementById('new_status').value = currentStatus;
+            statusModal.style.display = 'block';
+        }
+
+        function deleteAsset(assetId) {
+            document.getElementById('deleteAssetId').value = assetId;
+            deleteModal.style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            deleteModal.style.display = 'none';
+        }
+
+        for (var i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].onclick = function() {
+                statusModal.style.display = 'none';
+                deleteModal.style.display = 'none';
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == statusModal) {
+                statusModal.style.display = 'none';
+            }
+            if (event.target == deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

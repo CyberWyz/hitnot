@@ -118,7 +118,7 @@ $all_result = $all_query->get_result();
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Security Personnel Management</title>
     <style>
@@ -154,38 +154,48 @@ $all_result = $all_query->get_result();
         }
         
         .sidebar-brand {
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 800;
-            padding: 1.5rem 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            padding: 2rem 1.5rem;
+            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .sidebar-brand i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-brand .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
         .sidebar-menu {
-            padding: 0;
+            padding: 2rem 0;
             list-style: none;
+            flex: 1;
         }
         
-        .sidebar-menu li {
-            margin: 0;
-        }
-        
-        .sidebar-menu a {
+        .sidebar-menu li a {
             display: block;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
         }
         
-        .sidebar-menu a:hover, .sidebar-menu a.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #e7fbf9;
+            transform: translateX(5px);
         }
         
         .sidebar-menu i {
@@ -445,113 +455,142 @@ $all_result = $all_query->get_result();
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
     <div class="admin-container">
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-shield-alt"></i> Admin Portal
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-shield-alt" style="font-size: 50px; color: white;"></i>
+                    <div class="title">Admin Portal</div>
+                </div>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="admin_assets.php"><i class="fas fa-laptop"></i> Assets</a></li>
-                <li><a href="admin_users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="scpersonnel.php" class="active"><i class="fas fa-user-shield"></i> Security Personnel</a></li>
-                <li><a href="admin_logs.php"><i class="fas fa-history"></i> System Logs</a></li>
-                <li><a href="admin_settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="admin_logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li>
+                    <a href="admin_dashboard.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_assets.php">
+                        <i class="fas fa-laptop"></i> Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_users.php">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li>
+                    <a href="scpersonnel.php" class="active">
+                        <i class="fas fa-user-shield"></i> Security Personnel
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_logs.php">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_settings.php">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_logout.php">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
         
-        <!-- Main Content Area -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
-                <h1>Security Personnel Management</h1>
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Security Personnel Management</h1>
+                </div>
                 <div class="user-info">
+                    <!-- Theme toggle as a proper button in the nav bar -->
+                    <button id="theme-toggle" class="nav-btn">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                    </button>
                     <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?></span>
-                    <a href="admin_logout.php" class="logout-btn">Logout</a>
+                    <i class="fas fa-user-shield" style="font-size: 24px;"></i>
                 </div>
             </div>
             
-            <!-- Page Content -->
-            <div class="container">
-                <?php echo $message; ?>
-                
-                <div class="tabs">
-                    <div class="tab active" data-tab="pending">
-                        Pending Approvals
-                        <?php if ($pending_count > 0): ?>
-                            <span class="notification-badge"><?php echo htmlspecialchars($pending_count); ?></span>
-                        <?php endif; ?>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Display Messages -->
+                <?php if (!empty($message)): ?>
+                    <div class="message <?php echo strpos($message, 'success') !== false ? 'success' : (strpos($message, 'error') !== false ? 'error' : 'warning'); ?>">
+                        <?php echo $message; ?>
                     </div>
-                    <div class="tab" data-tab="all">All Security Personnel</div>
-                    <div class="tab" data-tab="add">Add New Security Personnel</div>
+                <?php endif; ?>
+
+                <!-- Tabs Section -->
+                <div class="tabs-section">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="pending">
+                            Pending Approvals
+                            <?php if ($pending_count > 0): ?>
+                                <span class="notification-badge"><?php echo htmlspecialchars($pending_count); ?></span>
+                            <?php endif; ?>
+                        </button>
+                        <button class="tab-btn" data-tab="all">All Security Personnel</button>
+                        <button class="tab-btn" data-tab="add">Add New Security Personnel</button>
+                    </div>
                 </div>
-                
+
                 <!-- Pending Approvals Tab -->
                 <div class="tab-content active" id="pending-tab">
                     <?php if ($pending_count > 0): ?>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Officer ID</th>
-                                    <th>Name</th>
-                                    <th>Last Name</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($personnel = $pending_result->fetch_assoc()): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($personnel['officer_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['name']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['lastname']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['email']); ?></td>
-                                        <td>
-                                            <span class="status status-pending">Pending</span>
-                                        </td>
-                                        <td>
+                        <?php while ($personnel = $pending_result->fetch_assoc()): ?>
+                            <div class="personnel-info">
+                                <div class="personnel-details">
+                                    <div style="flex: 2; min-width: 300px;">
+                                        <h3><?php echo htmlspecialchars($personnel['name'] . ' ' . $personnel['lastname']); ?></h3>
+                                        <p><b>Officer ID:</b> <?php echo htmlspecialchars($personnel['officer_id']); ?></p>
+                                        <p><b>Email:</b> <?php echo htmlspecialchars($personnel['email']); ?></p>
+                                        <p><b>Status:</b> <span class="status-badge status-pending">Pending</span></p>
+
+                                        <!-- Admin Actions -->
+                                        <div class="admin-actions">
                                             <form method="post" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($personnel['id']); ?>">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                                <button type="submit" name="approve" class="btn btn-success">Approve</button>
-                                                <button type="submit" name="reject" class="btn btn-danger">Reject</button>
+                                                <button type="submit" name="approve" class="action-btn approve">Approve</button>
+                                                <button type="submit" name="reject" class="action-btn reject">Reject</button>
                                             </form>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
                     <?php else: ?>
-                        <p>No pending approval requests at this time.</p>
+                        <p style="text-align: center; padding: 20px;">No pending approval requests at this time.</p>
                     <?php endif; ?>
                 </div>
-                
+
                 <!-- All Security Personnel Tab -->
                 <div class="tab-content" id="all-tab">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Officer ID</th>
-                                <th>Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if ($all_result->num_rows > 0): ?>
-                                <?php while ($personnel = $all_result->fetch_assoc()): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($personnel['officer_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['name']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['lastname']); ?></td>
-                                        <td><?php echo htmlspecialchars($personnel['email']); ?></td>
-                                        <td>
-                                            <?php 
+                    <?php if ($all_result->num_rows > 0): ?>
+                        <?php while ($personnel = $all_result->fetch_assoc()): ?>
+                            <div class="personnel-info">
+                                <div class="personnel-details">
+                                    <div style="flex: 2; min-width: 300px;">
+                                        <h3><?php echo htmlspecialchars($personnel['name'] . ' ' . $personnel['lastname']); ?></h3>
+                                        <p><b>Officer ID:</b> <?php echo htmlspecialchars($personnel['officer_id']); ?></p>
+                                        <p><b>Email:</b> <?php echo htmlspecialchars($personnel['email']); ?></p>
+                                        <p><b>Status:</b>
+                                            <?php
                                             $status_class = '';
                                             switch ($personnel['status']) {
                                                 case 'approved':
@@ -565,66 +604,66 @@ $all_result = $all_query->get_result();
                                                     break;
                                             }
                                             ?>
-                                            <span class="status <?php echo $status_class; ?>">
+                                            <span class="status-badge <?php echo $status_class; ?>">
                                                 <?php echo ucfirst(htmlspecialchars($personnel['status'])); ?>
                                             </span>
-                                        </td>
-                                        <td>
+                                        </p>
+
+                                        <!-- Admin Actions -->
+                                        <div class="admin-actions">
                                             <form method="post" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($personnel['id']); ?>">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                                
+
                                                 <?php if ($personnel['status'] != 'approved'): ?>
-                                                    <button type="submit" name="approve" class="btn btn-success">Approve</button>
+                                                    <button type="submit" name="approve" class="action-btn approve">Approve</button>
                                                 <?php endif; ?>
-                                                
+
                                                 <?php if ($personnel['status'] != 'rejected'): ?>
-                                                    <button type="submit" name="reject" class="btn btn-warning">Reject</button>
+                                                    <button type="submit" name="reject" class="action-btn reject">Reject</button>
                                                 <?php endif; ?>
-                                                
-                                                <button type="submit" name="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this security personnel?');">Delete</button>
+
+                                                <button type="submit" name="delete" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this security personnel?');">Delete</button>
                                             </form>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="6">No security personnel found.</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p style="text-align: center; padding: 20px;">No security personnel found.</p>
+                    <?php endif; ?>
                 </div>
-                
+
                 <!-- Add New Security Personnel Tab -->
                 <div class="tab-content" id="add-tab">
-                    <div class="form-box">
-                        <header>Add New Security Personnel</header>
+                    <div class="add-form-section">
+                        <h3><i class="fas fa-plus"></i> Add New Security Personnel</h3>
                         <form action="" method="post">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                            <div class="field input">
-                                <label for="officer_id">Officer ID</label>
-                                <input type="text" name="officer_id" id="officer_id" required maxlength="50">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="officer_id">Officer ID</label>
+                                    <input type="text" name="officer_id" id="officer_id" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastname">Last Name</label>
+                                    <input type="text" name="lastname" id="lastname" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" id="email" required maxlength="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" name="password" id="password" required minlength="8">
+                                </div>
                             </div>
-                            <div class="field input">
-                                <label for="name">Name</label>
-                                <input type="text" name="name" id="name" required maxlength="50">
-                            </div>
-                            <div class="field input">
-                                <label for="lastname">Last Name</label>
-                                <input type="text" name="lastname" id="lastname" required maxlength="50">
-                            </div>
-                            <div class="field input">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" id="email" required maxlength="100">
-                            </div>
-                            <div class="field input">
-                                <label for="password">Password</label>
-                                <input type="password" name="password" id="password" required minlength="8">
-                            </div>
-                            <div class="field">
-                                <input type="submit" name="add_security" value="Add Security Personnel" class="btn btn-primary">
-                            </div>
+                            <button type="submit" name="add_security" class="btn-submit">Add Security Personnel</button>
                         </form>
                     </div>
                 </div>
@@ -632,26 +671,28 @@ $all_result = $all_query->get_result();
         </div>
     </div>
     
+    <script src="js/particles.js"></script>
+    <script src="js/home.js"></script>
     <script>
         // Tab switching functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.tab');
-            
+            const tabs = document.querySelectorAll('.tab-btn');
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     // Remove active class from all tabs
-                    document.querySelectorAll('.tab').forEach(t => {
+                    document.querySelectorAll('.tab-btn').forEach(t => {
                         t.classList.remove('active');
                     });
-                    
+
                     // Add active class to clicked tab
                     this.classList.add('active');
-                    
+
                     // Hide all tab content
                     document.querySelectorAll('.tab-content').forEach(content => {
                         content.classList.remove('active');
                     });
-                    
+
                     // Show the corresponding tab content
                     const tabId = this.getAttribute('data-tab');
                     document.getElementById(tabId + '-tab').classList.add('active');

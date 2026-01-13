@@ -34,11 +34,254 @@ $all_query = mysqli_query($con, "SELECT * FROM scpersonnel ORDER BY status, id D
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/home-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="responsive.css">
     <title>Security Personnel Approvals</title>
     <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: modalopen 0.3s;
+        }
+
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-teal));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .btn-delete, .btn-cancel {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* Security Personnel Card Styles */
+        .personnel-info {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .personnel-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-teal), var(--primary-dark));
+        }
+
+        .personnel-info h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .personnel-info p {
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        .personnel-info b {
+            color: var(--accent-teal);
+        }
+
+        .personnel-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .personnel-details-left, .personnel-details-right {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.approve {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .action-btn.reject {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .action-btn.delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        /* Admin Actions Container */
+        .admin-actions {
+            margin-top: 15px;
+        }
+
+        /* Tab Styles */
+        .tabs-section {
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary-dark), var(--accent-teal));
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-badge {
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
         /* Add your existing admin styles here */
         
         .badge {
@@ -130,221 +373,274 @@ $all_query = mysqli_query($con, "SELECT * FROM scpersonnel ORDER BY status, id D
         .tab-content > .active {
             display: block;
         }
+
+        /* Dashboard Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #4b648d, #41737c);
+            color: #ffffff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-brand .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 2rem 0;
+            list-style: none;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #e7fbf9;
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <!-- Particle Background -->
+    <div class="particles-container"></div>
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-shield-alt"></i> Admin Portal
+                <div class="sidebar-brand-content">
+                    <i class="fas fa-shield-alt" style="font-size: 50px; color: white;"></i>
+                    <div class="title">Admin Portal</div>
+                </div>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="admin_dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="admin_security_approvals.php" class="active"><i class="fas fa-user-shield"></i> Security Personnel</a></li>
-                <li><a href="admin_assets.php"><i class="fas fa-laptop"></i> Assets</a></li>
-                <li><a href="admin_users.php"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="admin_logs.php"><i class="fas fa-history"></i> System Logs</a></li>
-                <li><a href="admin_settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="welcome.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li>
+                    <a href="admin_dashboard.php">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_assets.php">
+                        <i class="fas fa-laptop"></i> Assets
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_users.php">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_security_approvals.php" class="active">
+                        <i class="fas fa-user-shield"></i> Security Personnel
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_logs.php">
+                        <i class="fas fa-history"></i> System Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="admin_settings.php">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="welcome.php">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
-        
-        <!-- Main Content -->
+
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
-                <h1>Security Personnel Management</h1>
+                <div style="display: flex; align-items: center;">
+                    <button class="toggle-sidebar" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Security Personnel Approvals</h1>
+                </div>
                 <div class="user-info">
-                    <span>Welcome, <?php echo $_SESSION['admin_username']; ?></span>
-                    <a href="admin_logout.php" class="logout-btn">Logout</a>
+                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></span>
+                    <i class="fas fa-user-shield" style="font-size: 24px;"></i>
                 </div>
             </div>
             
-            <!-- Message Display -->
-            <?php echo $message; ?>
-            
-            <!-- Tabs Navigation -->
-            <ul class="nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" id="pending-tab" data-toggle="tab" href="#pending">
-                        Pending Approvals 
-                        <?php if (mysqli_num_rows($pending_query) > 0): ?>
-                            <span class="notification-badge"><?php echo mysqli_num_rows($pending_query); ?></span>
-                        <?php endif; ?>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="all-tab" data-toggle="tab" href="#all">All Security Personnel</a>
-                </li>
-            </ul>
-            
-            <!-- Tab Content -->
-            <div class="tab-content">
-                <!-- Pending Approvals Tab -->
-                <div class="tab-pane active" id="pending">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>Pending Security Personnel Approvals</h2>
-                        </div>
-                        <div class="card-body">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Display Messages -->
+                <?php if (!empty($message)): ?>
+                    <div class="message <?php echo strpos($message, 'success') !== false ? 'success' : (strpos($message, 'error') !== false ? 'error' : 'warning'); ?>">
+                        <?php echo $message; ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Tabs Section -->
+                <div class="tabs-section">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="pending">
+                            Pending Approvals
                             <?php if (mysqli_num_rows($pending_query) > 0): ?>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Officer ID</th>
-                                                <th>Name</th>
-                                                <th>Last Name</th>
-                                                <th>Email</th>
-                                                <th>Registration Date</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php while ($personnel = mysqli_fetch_assoc($pending_query)): ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($personnel['officer_id']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['name']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['lastname']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['email']); ?></td>
-                                                    <td>
-                                                        <?php 
-                                                        if (isset($personnel['created_at'])) {
-                                                            echo date('M d, Y', strtotime($personnel['created_at']));
-                                                        } else {
-                                                            echo "N/A";
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <form method="post" style="display:inline;">
-                                                            <input type="hidden" name="id" value="<?php echo $personnel['id']; ?>">
-                                                            <button type="submit" name="approve" class="btn btn-success btn-sm">
-                                                                <i class="fas fa-check"></i> Approve
-                                                            </button>
-                                                            <button type="submit" name="reject" class="btn btn-danger btn-sm">
-                                                                <i class="fas fa-times"></i> Reject
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php else: ?>
-                                <p>No pending approval requests at this time.</p>
+                                <span class="notification-badge"><?php echo mysqli_num_rows($pending_query); ?></span>
                             <?php endif; ?>
-                        </div>
+                        </button>
+                        <button class="tab-btn" data-tab="all">All Security Personnel</button>
                     </div>
                 </div>
-                
-                <!-- All Security Personnel Tab -->
-                <div class="tab-pane" id="all">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>All Security Personnel</h2>
-                        </div>
-                        <div class="card-body">
-                            <?php if (mysqli_num_rows($all_query) > 0): ?>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Officer ID</th>
-                                                <th>Name</th>
-                                                <th>Last Name</th>
-                                                <th>Email</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php while ($personnel = mysqli_fetch_assoc($all_query)): ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($personnel['officer_id']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['name']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['lastname']); ?></td>
-                                                    <td><?php echo htmlspecialchars($personnel['email']); ?></td>
-                                                    <td>
-                                                        <?php 
-                                                        $status_class = '';
-                                                        switch ($personnel['status']) {
-                                                            case 'approved':
-                                                                $status_class = 'badge-success';
-                                                                break;
-                                                            case 'pending':
-                                                                $status_class = 'badge-warning';
-                                                                break;
-                                                            case 'rejected':
-                                                                $status_class = 'badge-danger';
-                                                                break;
-                                                            default:
-                                                                $status_class = 'badge-secondary';
-                                                        }
-                                                        ?>
-                                                        <span class="badge <?php echo $status_class; ?>">
-                                                            <?php echo ucfirst(htmlspecialchars($personnel['status'])); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <?php if ($personnel['status'] != 'approved'): ?>
-                                                            <form method="post" style="display:inline;">
-                                                                <input type="hidden" name="id" value="<?php echo $personnel['id']; ?>">
-                                                                <button type="submit" name="approve" class="btn btn-success btn-sm">
-                                                                    <i class="fas fa-check"></i> Approve
-                                                                </button>
-                                                            </form>
-                                                        <?php endif; ?>
-                                                        
-                                                        <?php if ($personnel['status'] != 'rejected'): ?>
-                                                            <form method="post" style="display:inline;">
-                                                                <input type="hidden" name="id" value="<?php echo $personnel['id']; ?>">
-                                                                <button type="submit" name="reject" class="btn btn-danger btn-sm">
-                                                                    <i class="fas fa-times"></i> Reject
-                                                                </button>
-                                                            </form>
-                                                        <?php endif; ?>
-                                                        
-                                                        <a href="admin_edit_security.php?id=<?php echo $personnel['id']; ?>" class="btn btn-primary btn-sm">
-                                                            <i class="fas fa-edit"></i> Edit
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
+
+                <!-- Pending Approvals Tab -->
+                <div class="tab-content active" id="pending-tab">
+                    <?php if (mysqli_num_rows($pending_query) > 0): ?>
+                        <?php while ($personnel = mysqli_fetch_assoc($pending_query)): ?>
+                            <div class="personnel-info">
+                                <div class="personnel-details">
+                                    <div style="flex: 2; min-width: 300px;">
+                                        <h3><?php echo htmlspecialchars($personnel['name'] . ' ' . $personnel['lastname']); ?></h3>
+                                        <p><b>Officer ID:</b> <?php echo htmlspecialchars($personnel['officer_id']); ?></p>
+                                        <p><b>Email:</b> <?php echo htmlspecialchars($personnel['email']); ?></p>
+                                        <p><b>Registration Date:</b> <?php echo htmlspecialchars($personnel['created_at'] ?? 'N/A'); ?></p>
+                                        <p><b>Status:</b> <span class="status-badge status-pending">Pending</span></p>
+
+                                        <!-- Admin Actions -->
+                                        <div class="admin-actions">
+                                            <form method="post" style="display:inline;">
+                                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($personnel['id']); ?>">
+                                                <button type="submit" name="approve" class="action-btn approve">Approve</button>
+                                                <button type="submit" name="reject" class="action-btn reject">Reject</button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                            <?php else: ?>
-                                <p>No security personnel found.</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p style="text-align: center; padding: 20px;">No pending approval requests at this time.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- All Security Personnel Tab -->
+                <div class="tab-content" id="all-tab">
+                    <?php if (mysqli_num_rows($all_query) > 0): ?>
+                        <?php while ($personnel = mysqli_fetch_assoc($all_query)): ?>
+                            <div class="personnel-info">
+                                <div class="personnel-details">
+                                    <div style="flex: 2; min-width: 300px;">
+                                        <h3><?php echo htmlspecialchars($personnel['name'] . ' ' . $personnel['lastname']); ?></h3>
+                                        <p><b>Officer ID:</b> <?php echo htmlspecialchars($personnel['officer_id']); ?></p>
+                                        <p><b>Email:</b> <?php echo htmlspecialchars($personnel['email']); ?></p>
+                                        <p><b>Registration Date:</b> <?php echo htmlspecialchars($personnel['created_at'] ?? 'N/A'); ?></p>
+                                        <p><b>Status:</b>
+                                            <?php
+                                            $status_class = '';
+                                            switch ($personnel['status']) {
+                                                case 'approved':
+                                                    $status_class = 'status-approved';
+                                                    break;
+                                                case 'pending':
+                                                    $status_class = 'status-pending';
+                                                    break;
+                                                case 'rejected':
+                                                    $status_class = 'status-rejected';
+                                                    break;
+                                            }
+                                            ?>
+                                            <span class="status-badge <?php echo $status_class; ?>">
+                                                <?php echo ucfirst(htmlspecialchars($personnel['status'])); ?>
+                                            </span>
+                                        </p>
+
+                                        <!-- Admin Actions -->
+                                        <div class="admin-actions">
+                                            <form method="post" style="display:inline;">
+                                                <input type="hidden" name="id" value="<?php echo htmlspecialchars($personnel['id']); ?>">
+                                                <?php if ($personnel['status'] != 'approved'): ?>
+                                                    <button type="submit" name="approve" class="action-btn approve">Approve</button>
+                                                <?php endif; ?>
+
+                                                <?php if ($personnel['status'] != 'rejected'): ?>
+                                                    <button type="submit" name="reject" class="action-btn reject">Reject</button>
+                                                <?php endif; ?>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p style="text-align: center; padding: 20px;">No security personnel found.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
-    
+    <script src="js/particles.js"></script>
+    <script src="js/home.js"></script>
     <script>
         // Tab switching functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const tabs = document.querySelectorAll('.nav-link');
-            
+            const tabs = document.querySelectorAll('.tab-btn');
+
             tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all tabs and panes
-                    document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                    
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab-btn').forEach(t => {
+                        t.classList.remove('active');
+                    });
+
                     // Add active class to clicked tab
                     this.classList.add('active');
-                    
-                    // Show corresponding tab content
-                    const target = this.getAttribute('href').substring(1);
-                    document.getElementById(target).classList.add('active');
+
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+
+                    // Show the corresponding tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId + '-tab').classList.add('active');
                 });
             });
         });

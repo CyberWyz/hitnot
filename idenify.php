@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 </div>
 
                 <div class="links">
-                    Don't have an account? <a href="unified_register.php">Register Now</a>
+                    Don't have an account? <a href="reg1.php">Register Now</a>
                 </div>
             </form>
             
